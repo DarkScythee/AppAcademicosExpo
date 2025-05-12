@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "AppAcademicos",
+    "slug": "AppAcademicos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "appacademicos",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "projectId": "186c5a6a-50c6-49fa-8b0a-a34e6a616c40",
+    "notification": {
+      "icon": "./assets/images/icon.png",
+      "color": "#2195F2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tuempresa.appacademicos",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.tuempresa.appacademicos"
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "186c5a6a-50c6-49fa-8b0a-a34e6a616c40"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/186c5a6a-50c6-49fa-8b0a-a34e6a616c40"
+    }
+  }
+}
