@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
   },
   colorContainer: {
     alignItems: 'center',
-    height: 130,
+    height: 170,
   },
   TituloP: {
     color: '#ffffff',

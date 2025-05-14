@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ImageBackground, FlatList, Image, TouchableOpacity, Linking, Modal, Pressable, ScrollView } from 'react-native';
+import { FlatList, Image, ImageBackground, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../ManejoDatos';
 
 // imagenes
@@ -473,6 +473,7 @@ const styles = StyleSheet.create({
         maxWidth: 380,          // Puedes establecer un valor máximo si quieres evitar que se haga demasiado ancho en pantallas grandes.
         height: '7%',
         alignSelf: 'center',    // Esto asegura que se mantenga centrado en la pantalla.
+        paddingBottom: 80,
     },
     
     profileContainer3: {

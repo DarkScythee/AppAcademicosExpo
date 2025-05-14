@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "AppAcademicos",
+    "name": "App Academicos",
     "slug": "AppAcademicos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/UCT_logoC.png",
     "scheme": "appacademicos",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "projectId": "186c5a6a-50c6-49fa-8b0a-a34e6a616c40",
     "notification": {
-      "icon": "./assets/images/icon.png",
+      "icon": "./assets/images/UCT_logoC.png",
       "color": "#2195F2"
     },
     "ios": {

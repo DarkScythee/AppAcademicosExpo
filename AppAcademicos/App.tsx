@@ -1,10 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, } from '@react-navigation/drawer';
+import { DrawerActions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import { UserProvider, useUser } from './screens/ManejoDatos'; // Asegúrate de la ruta correcta
@@ -26,7 +27,7 @@ const closeIcon = require('./imagenes/flecha_derecha.png');
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
-
+const { width, height } = Dimensions.get('window');
 
 // ---------------VARIABLES PARA CONFIGURACION DE MENU LATERAL--------------
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
@@ -183,6 +184,9 @@ const MainScreenDrawer = () => {
 // Tabnavigator es el menu inferior con todos los estilos que posee para que quede
 // de la manera en la que esta.
 const TabNavigator = () => {
+
+const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ navigation }) => ({
@@ -218,11 +222,27 @@ const TabNavigator = () => {
       <Image source={homeIcon} style={[styles.icon, { tintColor: color }]} />
     ),
     tabBarLabel: () => null, // No mostrar etiqueta
-    headerShown: true, // Mostrar encabezado
+    headerShown: true,
+    tabBarStyle: {
+      position: 'absolute',
+      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
+      left: 20,
+      right: 20,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.5,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      height: 50,
+      borderWidth: 0.2,
+    },
+    
     headerTitle: () => null, // No mostrar título en el encabezado
     headerLeft: () => (
       <TouchableOpacity 
-        onPress={() => navigation.openDrawer()} 
+         onPress={() => navigation.dispatch(DrawerActions.openDrawer())} 
         style={{ zIndex: 1, position: 'absolute' }} 
         hitSlop={{ top: 30, bottom: 50, left: 30, right: 20 }} // Aumenta el área tocable
       >
@@ -248,6 +268,21 @@ const TabNavigator = () => {
           title: 'Calendario Institucional',
           tabBarLabel: () => null,
           headerShown: false,
+          tabBarStyle: {
+      position: 'absolute',
+      bottom: insets.bottom + 0,
+      left: 20,
+      right: 20,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.5,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      height: 50,
+      borderWidth: 0.2,
+    },
         }} 
       />
        {/*Pantalla de la carga academica */}
@@ -259,6 +294,21 @@ const TabNavigator = () => {
           title: 'Carga Académica',
           tabBarLabel: () => null,
           headerShown: false, // No mostrar encabezado
+          tabBarStyle: {
+      position: 'absolute',
+      bottom: insets.bottom + 10,
+      left: 20,
+      right: 20,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.5,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      height: 50,
+      borderWidth: 0.2,
+    },
         }} 
       />
        {/*Pantalla del directorio */}
@@ -270,6 +320,21 @@ const TabNavigator = () => {
           title: 'Directorio',
           tabBarLabel: () => null,
           headerShown: false, // No mostrar encabezado
+          tabBarStyle: {
+      position: 'absolute',
+      bottom: insets.bottom + 10,
+      left: 20,
+      right: 20,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.5,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      height: 50,
+      borderWidth: 0.2,
+    },
         }} 
       />
     </Tab.Navigator>
@@ -316,14 +381,14 @@ const App = () => {
 
     // 👇 Este bloque muestra alertas de notificaciones en primer plano
       Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,  // Necesario para iOS
-        shouldShowList: true,    // También necesario para iOS
-      }),
-    });
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,  // Necesario para iOS
+      shouldShowList: true,    // También necesario para iOS
+    }),
+  });
 
 
 
@@ -341,7 +406,7 @@ const App = () => {
   useEffect(() => {
     if (Platform.OS === 'android') {
       try {
-        StatusBar.setBackgroundColor('rgb(70, 185, 235)');
+        StatusBar.setBackgroundColor('rgb(51, 177, 227)');
         StatusBar.setTranslucent(true);
       } catch (error) {
         console.error('Error configurando la barra de estado:', error);

@@ -1,206 +1,365 @@
-import React, { useCallback, useRef } from 'react';
-import { Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AgendaList, CalendarProvider, ExpandableCalendar, WeekCalendar } from 'react-native-calendars';
+import moment from 'moment';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Easing, Image, ImageSourcePropType, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AgendaList, CalendarProvider, ExpandableCalendar, LocaleConfig } from 'react-native-calendars';
 
-// ✅ Tipos de ítems y estructura de datos
-type AgendaItemType = {
+LocaleConfig.locales['es'] = {
+  monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+  monthNamesShort: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+  dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+  dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+  today: 'Hoy',
+};
+// Configuracion local en español.
+
+LocaleConfig.defaultLocale = 'es';
+const Uctlogo = require('../../imagenes/UCT_logoC.png');
+const GoogleCalendarLogo = require('../../imagenes/GoogleC.png');
+
+type RawApiEvent = {
+  Fecha_inicio: string;
+  Fecha_fin?: string;
+  Nombre_evento: string;
+  Imagen_local?: ImageSourcePropType;
+};
+
+type RawGoogleEvent = {
+  id: string;
+  summary: string;
+  htmlLink: string;
+  start: { dateTime?: string; date?: string };
+  end: { dateTime?: string; date?: string };
+};
+
+type MergedEvent = {
+  id: string;
+  title: string;
   hour: string;
   duration: string;
-  title: string;
+  tipo: 'inicio' | 'fin';
+  isGoogleEvent: boolean;
+  link?: string;
+  imageUrl?: ImageSourcePropType; 
 };
 
-type AgendaData = {
-  [date: string]: AgendaItemType[];
+type AgendaSection = {
+  title: string; // "YYYY-MM-DD"
+  data: MergedEvent[];
 };
 
-// 📆 Datos simulados de agenda
-const rawAgendaItems: AgendaData = {
-  '2025-05-12': [
-    {hour: '12pm', duration: '1h', title: 'Meeting with Juan'}
-  ],
-  '2025-05-13': [
-    {hour: '2pm', duration: '2h', title: 'Lunch with Maria'}
-  ]
-};
 
-// 🔄 Convertimos a secciones
-const ITEMS = Object.keys(rawAgendaItems).map(date => ({
-  title: date,
-  data: rawAgendaItems[date]
-}));
+const LoadingImage = () => {
+  const rotateAnim = useRef(new Animated.Value(0)).current;
 
-// 📍 Fechas marcadas
-const getMarkedDates = () => {
-  const marked: {[date: string]: {marked: boolean}} = {};
-  for (const date of Object.keys(rawAgendaItems)) {
-    marked[date] = {marked: true};
-  }
-  return marked;
-};
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 1000, // velocidad de rotación (2 segundos)
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [rotateAnim]);
 
-// 🎨 Tema básico
-const themeColor = '#ffff00';
-const lightThemeColor = '#F0F4F8';
-const theme = {
-  selectedDayBackgroundColor: themeColor,
-  todayTextColor: themeColor,
-  dotColor: themeColor,
-  arrowColor: themeColor,
-  monthTextColor: themeColor,
-  textMonthFontWeight: 'bold'
-};
+  const rotation = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
-// 🟢 Componente de ítem de agenda simple
-const AgendaItem = ({item}: {item: AgendaItemType}) => {
   return (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemHour}>{item.hour}</Text>
-      <Text style={styles.itemTitle}>{item.title}</Text>
-      <Text style={styles.itemDuration}>{item.duration}</Text>
+    <View style={styles.loaderestilo}>
+      <Animated.Image
+        source={require('../../imagenes/UCT_logoC.png')}
+        style={{
+          width: 100,
+          height: 100,
+          resizeMode: 'contain',
+          transform: [{ rotate: rotation }],
+        }}
+      />
     </View>
   );
 };
 
-// ⬅️ Iconos (puedes reemplazar por imágenes si lo deseas)
-const leftArrowIcon = undefined;
-const rightArrowIcon = undefined;
-const CHEVRON = undefined;
 
-interface Props {
-  weekView?: boolean;
-}
+const CalendarioAca = () => {
+  const [sections, setSections] = useState<AgendaSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const today = moment().format('YYYY-MM-DD');
 
-const ExpandableCalendarScreen = ({weekView}: Props) => {
-  const marked = useRef(getMarkedDates());
-  const todayBtnTheme = useRef({
-    todayButtonTextColor: themeColor
-  });
+  const loadData = async () => {
+  setLoading(true);
+  const [apiData, googleData] = await Promise.all([
+    fetchApiEvents(),
+    fetchGoogleEvents()
+  ]);
 
-  const calendarRef = useRef<{toggleCalendarPosition: () => boolean}>(null);
-  const rotation = useRef(new Animated.Value(0));
+  console.log('✅ Eventos desde la API:', apiData.length, apiData);
+  console.log('✅ Eventos desde Google:', googleData.length, googleData);
 
-  const toggleCalendarExpansion = useCallback(() => {
-    const isOpen = calendarRef.current?.toggleCalendarPosition();
-    Animated.timing(rotation.current, {
-      toValue: isOpen ? 1 : 0,
-      duration: 200,
-      useNativeDriver: true,
-      easing: Easing.out(Easing.ease)
-    }).start();
+  processEventsData(apiData, googleData);
+  setLoading(false);
+};
+
+
+  const fetchApiEvents = async (): Promise<RawApiEvent[]> => {
+    try {
+        const response = await fetch('https://api-appacademicos.uct.cl/ConsultasFechas', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb21pbmlvIiwiaWF0IjoxNzM0MTQ3NTQ1LCJzdWIiOiJSdXRVc3VhcmlvIn0.O_Lne8YoIIKMZ64GUjGo1G8gkyU6OiklmtBRXtzH1NA`,
+            'Content-Type': 'application/json'
+          }
+        });
+      return await response.json();
+    } catch (err) {
+      console.error('API error', err);
+      return [];
+    }
+  };
+
+  const fetchGoogleEvents = async (): Promise<RawGoogleEvent[]> => {
+    const CALENDAR_ID = 'mjancidakis2020@alu.uct.cl';
+    const API_KEY = 'AIzaSyAQ0GdogqqLnrr80I-CTz71Q5QN85amHiI';
+    const beginDate = moment().toISOString();
+    let allEvents: RawGoogleEvent[] = [];
+    let nextPageToken: string | null = null;
+
+    try {
+      do {
+        let url = `https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?key=${API_KEY}&timeMin=${beginDate}&singleEvents=true&orderBy=startTime&maxResults=249`;
+        if (nextPageToken) {
+          url += `&pageToken=${nextPageToken}`;
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const result = await response.json();
+        allEvents = allEvents.concat(result.items || []);
+        nextPageToken = result.nextPageToken;
+      } while (nextPageToken && allEvents.length < 249);
+
+      return allEvents;
+    } catch (err: any) {
+      console.error('Google error:', err.message);
+      Alert.alert('Error al obtener eventos de Google Calendar', err.message);
+      return [];
+    }
+  };
+
+  const formatDate = (input: string) => {
+    const date = new Date(input);
+    return moment(date).format('HH:mm');
+  };
+
+  const processEventsData = (
+    apiEvents: RawApiEvent[],
+    googleEvents: RawGoogleEvent[]
+  ) => {
+    const merged: { [date: string]: MergedEvent[] } = {};
+
+    // API propia
+    apiEvents.forEach((item, index) => {
+  if (!item.Fecha_inicio) return; // Validación por seguridad
+
+  const startDate = moment(item.Fecha_inicio).format('YYYY-MM-DD');
+  const hour = formatDate(item.Fecha_inicio);
+
+  const eventoInicio: MergedEvent = {
+    id: `api-${index}-start`,
+    title: `${item.Nombre_evento}`,
+    hour,
+    duration: '',
+    tipo: 'inicio',
+    isGoogleEvent: false,
+    imageUrl: Uctlogo 
+  };
+
+  if (!merged[startDate]) merged[startDate] = [];
+  merged[startDate].push(eventoInicio);
+
+  if (item.Fecha_fin) {
+    const endDate = moment(item.Fecha_fin).format('YYYY-MM-DD');
+    const endHour = formatDate(item.Fecha_fin);
+
+    const eventoFin: MergedEvent = {
+      id: `api-${index}-end`,
+      title: `${item.Nombre_evento}`,
+      hour: endHour,
+      duration: '',
+      tipo: 'fin',
+      isGoogleEvent: false,
+      imageUrl: Uctlogo
+    };
+
+    if (!merged[endDate]) merged[endDate] = [];
+    merged[endDate].push(eventoFin);
+  }
+});
+
+
+    // Google Calendar
+    googleEvents.forEach(event => {
+  const startStr = event.start?.dateTime || event.start?.date;
+  const endStr = event.end?.dateTime || event.end?.date;
+
+  if (!startStr) return; // 🚫 Ignora eventos sin fecha de inicio
+
+  const startDate = moment(startStr).format('YYYY-MM-DD');
+  const startEvent: MergedEvent = {
+    id: `${event.id}-start`,
+    title: `${event.summary}`,
+    hour: formatDate(startStr),
+    duration: '',
+    tipo: 'inicio',
+    isGoogleEvent: true,
+    link: event.htmlLink,
+    imageUrl: GoogleCalendarLogo
+  };
+
+  if (!merged[startDate]) merged[startDate] = [];
+  merged[startDate].push(startEvent);
+
+  if (endStr) {
+    const endDate = moment(endStr).format('YYYY-MM-DD');
+
+    if (startDate !== endDate) {
+      const endEvent: MergedEvent = {
+        id: `${event.id}-end`,
+        title: `${event.summary}`,
+        hour: formatDate(endStr),
+        duration: '',
+        tipo: 'fin',
+        isGoogleEvent: true,
+        link: event.htmlLink,
+        imageUrl: GoogleCalendarLogo
+      };
+
+      if (!merged[endDate]) merged[endDate] = [];
+      merged[endDate].push(endEvent);
+    }
+  }
+});
+
+
+    // Convertir a secciones ordenadas
+    const ordered = Object.keys(merged)
+      .sort()
+      .map(date => ({
+        title: date,
+        data: merged[date]
+      }));
+
+    setSections(ordered);
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
-  const renderHeader = useCallback(
-    (date?: any) => {
-      const rotationInDegrees = rotation.current.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '-180deg']
-      });
+  const renderItem = useCallback(({ item }: { item: MergedEvent }) => (
+  <TouchableOpacity
+    onPress={() => item.isGoogleEvent && item.link && Linking.openURL(item.link)}
+    style={styles.itemContainer}
+  >
+    <View style={styles.textContainer}>
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemHour}>
+        {item.tipo === 'inicio' ? 'Inicio: ' : 'Término: '}
+        {item.hour}
+      </Text>
+    </View>
+    {item.imageUrl && (
+      <Image
+        source={item.imageUrl}
+        style={styles.image}
+        resizeMode="contain"
+      />
+    )}
+  </TouchableOpacity>
+), []);
 
-      return (
-        <TouchableOpacity style={styles.header} onPress={toggleCalendarExpansion}>
-          <Text style={styles.headerTitle}>
-            {date?.toString('MMMM yyyy') || ''}
-          </Text>
-          <Animated.Image
-            source={CHEVRON}
-            style={{
-              transform: [{rotate: '90deg'}, {rotate: rotationInDegrees}],
-              width: 10,
-              height: 10
-            }}
-          />
-        </TouchableOpacity>
-      );
-    },
-    [toggleCalendarExpansion]
-  );
 
-  const onCalendarToggled = useCallback(
-    (isOpen: boolean) => {
-      rotation.current.setValue(isOpen ? 1 : 0);
-    },
-    []
-  );
+  return loading ? (
+    <LoadingImage/>
+  ) : (
 
-  const renderItem = useCallback(({item}: {item: AgendaItemType}) => {
-    return <AgendaItem item={item} />;
-  }, []);
-
-  return (
-    <CalendarProvider
-      date={ITEMS[0]?.title}
-      showTodayButton
-      theme={todayBtnTheme.current}
-    >
-      {weekView ? (
-        <WeekCalendar
-          firstDay={1}
-          markedDates={marked.current}
+<View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 55 : 35 }}>
+    <CalendarProvider date={today} showTodayButton todayBottomMargin={120}>
+      <ExpandableCalendar
+        firstDay={1}
+        markedDates={sections.reduce((acc, sec) => {
+          acc[sec.title] = { marked: true };
+          return acc;
+        }, {} as { [key: string]: { marked: boolean } })}
+        theme={{
+        selectedDayBackgroundColor: '#37bbed', // verde
+        selectedDayTextColor: '#fff',
+        todayTextColor: '#37bbed', // rojo para "Hoy"
+        dayTextColor: '#000',
+        textDisabledColor: '#ccc',
+        arrowColor: '#127ea7', 
+        monthTextColor: '#127ea7', 
+        textSectionTitleColor: '#444',
+  }}
         />
-      ) : (
-        <ExpandableCalendar
-          renderHeader={renderHeader}
-          ref={calendarRef}
-          onCalendarToggled={onCalendarToggled}
-          firstDay={1}
-          markedDates={marked.current}
-          leftArrowImageSource={leftArrowIcon}
-          rightArrowImageSource={rightArrowIcon}
-        />
-      )}
       <AgendaList
-        sections={ITEMS}
+        sections={sections}
         renderItem={renderItem}
         sectionStyle={styles.section}
+         refreshing={loading}
+        onRefresh={loadData}
       />
     </CalendarProvider>
+    </View>
   );
 };
 
-export default ExpandableCalendarScreen;
+export default CalendarioAca;
 
 const styles = StyleSheet.create({
-  calendar: {
-    paddingLeft: 20,
-    paddingRight: 20
-  },
-  header: {
-    flexDirection: 'row',
+  loader: {
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 6
-  },
-  section: {
-    backgroundColor: lightThemeColor,
-    color: 'grey',
-    textTransform: 'capitalize',
-    paddingVertical: 4,
-    paddingHorizontal: 10
+    alignItems: 'center'
   },
   itemContainer: {
-    backgroundColor: 'white',
-    padding: 12,
-    marginVertical: 4,
-    marginHorizontal: 10,
+    backgroundColor: '#fff',
+    margin: 10,
     borderRadius: 6,
-    elevation: 2
-  },
-  itemHour: {
-    fontSize: 12,
-    color: '#888'
+    padding: 10,
+    elevation: 2,
+     flexDirection: 'row',  // Alinea el contenido en fila
+    justifyContent: 'space-between', // Deja espacio entre texto e imagen
+    alignItems: 'center',  // Centra los elementos verticalmente
   },
   itemTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    marginVertical: 2
+    fontWeight: 'bold'
   },
-  itemDuration: {
-    fontSize: 12,
-    color: '#666'
-  }
+  itemHour: {
+    color: '#666',
+    marginTop: 4
+  },
+  section: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#f0f0f0'
+  },
+  image: {
+    height: 60,
+    width: 60,  // Ajusta el tamaño de la imagen según lo necesites
+    borderRadius: 6,
+  },
+  textContainer: {
+    flex: 1,  // Permite que el texto ocupe el espacio disponible
+  },
+  loaderestilo:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+
 });

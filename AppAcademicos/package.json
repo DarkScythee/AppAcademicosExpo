@@ -31,12 +31,14 @@
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.4",
     "expo-system-ui": "~5.0.7",
+    "expo-updates": "~0.28.12",
     "expo-web-browser": "~14.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
     "react-native-calendars": "^1.1312.0",
     "react-native-date-picker": "^5.0.12",
+    "react-native-device-info": "^14.0.4",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-reanimated": "~3.17.4",
@@ -45,8 +47,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "xdate": "^0.8.3",
-    "expo-updates": "~0.28.12"
+    "xdate": "^0.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

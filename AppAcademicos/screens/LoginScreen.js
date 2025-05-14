@@ -166,11 +166,11 @@ const LoginScreen = () => {
               ¿Olvidaste tu contraseña?
             </Text>
           </Pressable>
-          <Pressable style={styles.button} onPress={sendTestNotification}>
+          {/*<Pressable style={styles.button} onPress={sendTestNotification}>
             <Text style={styles.buttonText} allowFontScaling={false}>
               Enviar Notificación de Prueba
             </Text>
-          </Pressable>
+          </Pressable>*/}
         </View>
       </ImageBackground>
     </View>

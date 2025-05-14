@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, FlatList, Image, ImageBackground, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import { ActivityIndicator, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import Modal from 'react-native-modal';
 import { useUser } from '../ManejoDatos';
 const BuscadorD = require('../../imagenes/lupa.png');
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: Platform.OS === 'ios' ? 60 : 30, // Ajusta solo para iOS (iPhone)
     left: 20,
     zIndex: 1,
   },
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   },
   colorContainer: {
     alignItems: 'center',
-    height: 130,
+    height: 170,
     width: '100%',
 
   },
