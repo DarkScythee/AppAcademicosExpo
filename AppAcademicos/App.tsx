@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, } from '@react-navigation/drawer';
 import { DrawerActions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
@@ -28,7 +29,7 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get('window');
-
+const isTablet = Device.deviceType === Device.DeviceType.TABLET;
 // ---------------VARIABLES PARA CONFIGURACION DE MENU LATERAL--------------
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   const { clearUserData } = useUser();
@@ -235,7 +236,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: 50,
+      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
     
@@ -270,7 +271,7 @@ const insets = useSafeAreaInsets();
           headerShown: false,
           tabBarStyle: {
       position: 'absolute',
-      bottom: insets.bottom + 0,
+      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
       left: 20,
       right: 20,
       elevation: 5,
@@ -280,7 +281,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: 50,
+      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -296,7 +297,7 @@ const insets = useSafeAreaInsets();
           headerShown: false, // No mostrar encabezado
           tabBarStyle: {
       position: 'absolute',
-      bottom: insets.bottom + 10,
+      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
       left: 20,
       right: 20,
       elevation: 5,
@@ -306,7 +307,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: 50,
+      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -322,7 +323,7 @@ const insets = useSafeAreaInsets();
           headerShown: false, // No mostrar encabezado
           tabBarStyle: {
       position: 'absolute',
-      bottom: insets.bottom + 10,
+      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
       left: 20,
       right: 20,
       elevation: 5,
@@ -332,7 +333,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: 50,
+      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -442,7 +443,6 @@ const styles = StyleSheet.create({
 
   },
   icon: {
-    paddingTop: 3,
     width: 28,
     height: 28,
   },
