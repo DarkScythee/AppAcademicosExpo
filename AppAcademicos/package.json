@@ -14,6 +14,7 @@
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-masked-view/masked-view": "^0.3.2",
+    "@react-native-picker/picker": "2.11.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/drawer": "^7.3.12",
     "@react-navigation/elements": "^2.3.8",
@@ -22,6 +23,7 @@
     "expo": "~53.0.9",
     "expo-blur": "~14.1.4",
     "expo-constants": "~17.1.6",
+    "expo-device": "~7.1.4",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.1.7",
@@ -39,6 +41,7 @@
     "react-native-calendars": "^1.1312.0",
     "react-native-date-picker": "^5.0.12",
     "react-native-device-info": "^14.0.4",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-reanimated": "~3.17.4",
@@ -47,8 +50,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "xdate": "^0.8.3",
-    "expo-device": "~7.1.4"
+    "xdate": "^0.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import { useUser } from '../ManejoDatos';
+
 const BuscadorD = require('../../imagenes/lupa.png');
 const BorradorT = require('../../imagenes/delete.png');
 const uctImage = require('../../imagenes/back.jpg');
@@ -35,6 +37,42 @@ const FormularioDirectorio = () => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [placeholder, SetPlaceholder] = useState('Buscar academicos');
+  const [unidadD, setUnidadD] = useState('');
+  const [cargoD, setCargoD] = useState('');
+
+  //Tipo
+  const [dropdownOpen, setDropdownOpen] = useState(false); 
+  //Unidad
+  const [UnidadOpen, setUnidadOpen] = useState(false); 
+  const [selectedUnidad, setselectedUnidad] = useState(null);
+  const [unidades, setUnidades] = useState([]);
+
+  //Cargo
+  const [CargoOpen, setCargoOpen] = useState(false); 
+  const [selectedCargo, setselectedCargo] = useState(null);
+  const [Cargos, setCargos] = useState([]);
+
+  //Carrera
+  const [CarreraOpen, setCarreraOpen] = useState(false); 
+  const [selectedCarrera, setselectedCarrera] = useState(null);
+  const [Carrera, setCarrera] = useState([]);
+
+  useEffect(() => {
+    fetchUnidades();
+    fetchCarreras();
+  }, []);
+
+  // Detectar cambio
+  useEffect(() => {
+  if (!selectedUnidad) return;
+
+  const unidad = unidades.find(u => u.ID.toString() === selectedUnidad);
+  console.log('Unidad seleccionada:', unidad?.DESC_UNIDAD || 'No encontrada');
+  fetchCargos(unidad.DESC_UNIDAD);
+  // Puedes guardar la descripción en otra variable de estado si la necesitas
+  // setDescripcionUnidad(unidad?.DESC_UNIDAD || '');
+}, [selectedUnidad, unidades]);
+
 
   // informacion sobre cada campus de la universidad, contiene la latitud y longitud
   // la cual sirve para que una funcion las tome, y las guarde y las pase como parametro
@@ -96,11 +134,40 @@ const FormularioDirectorio = () => {
     '12': 'DICIEMBRE'
 };
 
-function convertirFecha(fecha) {
-  // Separar el dia y el mes (cumpleaños)
-  const [mes, dia ] = fecha.split('-');
-  return `${dia} DE ${meses[mes]}`;
+const resetFilters = () => {
+    setSelected('Académicos');
+    setUnidadD('');
+    setCargoD('');
+  };
+
+  const applyFilters = () => {
+  // Buscar la unidad seleccionada
+  const unidadSeleccionada = unidades.find(
+    (u) => u.ID.toString() === selectedUnidad
+  );
+  
+  const descripcionUnidad = unidadSeleccionada ? unidadSeleccionada.DESC_UNIDAD : 'No seleccionada';
+
+  // Mostrar todo en consola
+  console.log({
+    selected,
+    selectedUnidad, // ID de la unidad
+    descripcionUnidad, // Descripción visible de la unidad
+    cargo
+  });
+
+  setIsOpen(!isOpen);
 };
+
+
+function convertirFecha(fecha) {
+  if (!fecha || typeof fecha !== 'string') {
+    return 'Fecha no disponible';
+  }
+
+  const [mes, dia] = fecha.split('-');
+  return `${dia} DE ${meses[mes] || 'MES DESCONOCIDO'}`;
+}
 
 // convierte la fecha y retorna el dia y mes ordenado para el modal de informacion
 // del academico
@@ -126,6 +193,88 @@ function probar(item){
 
   // Estado y referencia para la animación
   const animationValue = useRef(new Animated.Value(0)).current;
+
+  //Unidades
+ const fetchUnidades = async () => {
+
+  try {
+    const response = await fetch('http://192.168.100.4:8000/unidades', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data4 = await response.json();
+    const updatedUnidades = data4.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+    }));
+
+    setUnidades(updatedUnidades);  // Guardar el JSON completo en el estado
+    //console.log('Unidades cargadas:', updatedUnidades);  // Mostrar el JSON completo en consola
+  } catch (error) {
+    console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+
+ //Cargos
+const fetchCargos = async (unidad) => {
+  try {
+    const response = await fetch(`http://192.168.100.4:8000/cargos?unidad=${encodeURIComponent(unidad)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data6 = await response.json();
+    const updatedUnidades = data6.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+    }));
+
+    setCargos(updatedUnidades);  // Guardar el JSON completo en el estado
+    console.log('Unidades cargadas:', updatedUnidades);  // Mostrar el JSON completo en consola
+  } catch (error) {
+    console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+
+
+
+
+  // Carreras
+
+  const fetchCarreras = async () => {
+
+  try {
+    const response = await fetch('http://192.168.100.4:8000/obtenerCarrera', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data5 = await response.json();
+    const updatedUnidades5 = data5.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+    }));
+
+    setCarrera(updatedUnidades5);  // Guardar el JSON completo en el estado
+    //console.log('Carreras cargadas:', updatedUnidades5);  // Mostrar el JSON completo en consola
+  } catch (error) {
+    console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+
 
   // Fetch data para los academicos, obtencion de todos sus datos
   const fetchDataG = async (term) => {
@@ -210,6 +359,7 @@ useEffect(() => {
     if (searchTerm) {
       if (selected === 'Académicos') {
         fetchDataG(searchTerm);
+
         
       } else if (selected === 'Alumnos') {
         fetchDataA(searchTerm);
@@ -221,6 +371,7 @@ useEffect(() => {
     }
   }, [searchTerm, selected]);
 
+  
 
   // useEffect para la animacion
   useEffect(() => {
@@ -338,6 +489,15 @@ const filteredData = selected === 'Académicos'
     setIsOpen(!isOpen); 
   };
 
+  const handleOpenCargo = (open) => {
+  if (Cargos.length > 0) {
+    setCargoOpen(open);
+  } else {
+    setCargoOpen(false); // O asegúrate que quede cerrado
+    Alert.alert("Ingrese una unidad");
+  }
+};
+
   // Funcion de retorno de todo el componente en si, tanto el buscador, titulos etc.
   return (
     <View style={styles.container}>
@@ -371,38 +531,115 @@ const filteredData = selected === 'Académicos'
       </TouchableOpacity>
 
     </View>
-    <View style={styles.contenedortodo}>
 
-     {/*Si el filtro se activa, entonces mostrada dos botones, academicos o alumnos,
-     dependiendo de cual escoga, selected tomara un valor, y ese valor mas el searchTerm,
-     hacen que la busqueda sea por el termino que uno escriba y cual filtro escoge, en useEffect
-     */} 
-    {isOpen && (
-    <View style={styles.buttonContainer}>
-        <TouchableOpacity
-        allowFontScaling={false}
-          style={[styles.button, selected === 'Académicos' && styles.selectedButton]}
-          onPress={() => {
-            handleButtonPress('Académicos')
-            SetPlaceholder('Buscar académicos')
-          }}
-        >
-          <Text style={styles.buttonText} allowFontScaling={false}>Académicos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        allowFontScaling={false}
-          style={[styles.button, selected === 'Alumnos' && styles.selectedButton]}
-          onPress={() => {
-            handleButtonPress('Alumnos')
-            SetPlaceholder('Buscar estudiantes')
-          }}
-        >
-          <Text style={styles.buttonText} allowFontScaling={false}>Estudiantes</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.contenedortodo}>
       
-    )}
-  </View>
+      <Modal animationType="slide" transparent={true} visible={isOpen}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            
+            <Text style={styles.title}>Filtros</Text>
+
+            <Text style={styles.label}>Tipo</Text>
+            <DropDownPicker
+              open={dropdownOpen}
+              value={selected}
+              items={[
+                { label: 'Académicos', value: 'Académicos' },
+                { label: 'Alumnos', value: 'Alumnos' },
+              ]}
+              setOpen={setDropdownOpen}
+              setValue={setSelected}
+              setItems={() => {}}
+              zIndex={4000}
+              zIndexInverse={1000}
+            />
+
+            {/* Unidad - solo si se selecciona "Académicos" */}
+      {selected === 'Académicos' && (
+        <>
+          <Text style={styles.label}>Unidad</Text>
+          <DropDownPicker
+            open={UnidadOpen}
+            value={selectedUnidad}
+            setOpen={setUnidadOpen}
+            setValue={setselectedUnidad}
+            items={unidades.map((item) => ({
+              label: item.DESC_UNIDAD, // El texto que aparece en el dropdown
+              value: item.ID.toString(), // El valor del dropdown
+            }))}
+            searchable={true} // 🔍 habilita la búsqueda automática
+            searchPlaceholder="Buscar unidad"
+            placeholder="Seleccione una unidad"
+            zIndex={3000}
+            zIndexInverse={2000}
+          />
+
+
+
+        </>
+      )}
+
+      {/* Cargo - solo si se selecciona "Académicos" */}
+      {selected === 'Académicos' && (
+        <>
+          <Text style={styles.label}>Cargo</Text>
+          <DropDownPicker
+            open={CargoOpen}
+            value={selectedCargo}
+            items={Cargos.map((item) => ({
+              label: item.DESC_CARGO, // El texto que aparece en el dropdown
+              value: item.ID.toString(), // El valor del dropdown
+            }))}
+            searchable={true} // 🔍 habilita la búsqueda automática
+            searchPlaceholder="Buscar cargo"
+            placeholder="Selecciona un cargo"
+            setOpen={handleOpenCargo}
+            setValue={setselectedCargo}
+            setItems={() => {}}
+            zIndex={2000}
+            zIndexInverse={2000}
+          />
+        </>
+      )}
+
+      {/* Carrera - solo si se selecciona "Alumnos" */}
+      {selected === 'Alumnos' && (
+        <>
+          <Text style={styles.label}>Carrera</Text>
+          <DropDownPicker
+            open={CarreraOpen}
+            value={selectedCarrera}
+            items={Carrera.map((item) => ({
+              label: item.NOM_CARRERA, // El texto que aparece en el dropdown
+              value: item.ID.toString(), // El valor del dropdown
+            }))}
+            setOpen={setCarreraOpen}
+            setValue={setselectedCarrera}
+            setItems={() => {}}
+            searchable={true} // 👈 Habilita la búsqueda
+            placeholder="Selecciona una carrera"
+            searchPlaceholder="Buscar carrera"
+            zIndex={1000}
+            zIndexInverse={4000}
+          />
+        </>
+      )}
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
+                <Text style={styles.resetText}>Limpiar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={applyFilters} style={styles.applyButton}>
+                <Text style={styles.applyText}>Aplicar filtros</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      
+    </View>
+    
 
 {/*Esta flatlist muestra los datos de academico */}
     <FlatList
@@ -911,11 +1148,72 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   contenedortodo: {
-    marginLeft: 220,
+  marginLeft: 220,
     padding: 10,
+},
+
+
+//otros
+
+modalOverlay: {
+  
+  top: 0,               // Asegura que empieza desde la parte superior de la pantalla
+  left: 0,              // Asegura que empieza desde la parte izquierda
+  right: 0,             // Asegura que llega hasta el borde derecho
+  bottom: 0,            // Asegura que llega hasta el borde inferior
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Fondo oscuro con transparencia
+  justifyContent: 'center',  // Centra el contenido verticalmente
+  alignItems: 'center',      // Centra el contenido horizontalmente
+  width: '100%',            // Asegura que ocupe todo el ancho de la pantalla
+  height: '100%',           // Asegura que ocupe toda la altura de la pantalla
+  alignSelf: 'center',   // Centra el modal horizontalmente en la pantalla
+},
+
+  modalContent: {
+  backgroundColor: '#fff',
+  width: '90%',          // Ajuste para el tamaño del modal
+  height: '70%',
+  borderRadius: 10,
+  padding: 20,
+  elevation: 5,
+  
+},
+
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
   },
-
-
+  label: {
+    marginTop: 25,
+    fontWeight: '600',
+  },
+  
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 30,
+  },
+  resetButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+  },
+  applyButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+  },
+  resetText: {
+    color: '#333',
+  },
+  applyText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 
 
 

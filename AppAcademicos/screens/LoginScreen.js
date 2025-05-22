@@ -100,7 +100,7 @@ const LoginScreen = () => {
         trigger: fechaEvento,
       });
     } else {
-      console.log(`La fecha del evento "${nombreEvento}" ya ha pasado.`);
+    
     }
   };
 

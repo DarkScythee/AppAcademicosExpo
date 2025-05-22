@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, Image, ImageBackground, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, ImageBackground, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../ManejoDatos';
 
 // imagenes
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         padding: 10,
         borderRadius: 20,
-        top: 60,
+        top: Platform.OS === 'ios' ? 80 : 60,
         textAlign: 'left'
     },
     profileImage: {
@@ -393,13 +393,14 @@ const styles = StyleSheet.create({
         width: '95%',
         alignSelf: 'center',
         textAlign: 'center',
-        marginVertical: 10,
+        marginVertical: Platform.OS === 'ios' ? 22 : 10,
     },
     closeButtonText: {
         color: 'white',
         fontSize: 16,
         textAlign: 'center',
         fontFamily: 'Montserrat-Regular',
+        
     },
 
     card: {
@@ -561,7 +562,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat-Regular',
         fontSize: 28,
         textAlign: 'center',
-        marginTop: -20, // Ajusta este valor según sea necesario
+        marginTop: Platform.OS === 'ios' ? 0 : -20,
         padding: 5,
         color: 'black',
         
