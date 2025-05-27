@@ -147,9 +147,12 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
         {/* Contenedor para el botón "Cerrar sesión" */}
         <View style={styles.bottomContainer}>
           <DrawerItem
-            label="Cerrar Sesión"
+            label={({ focused, color }) => (
+              <Text style={{ color: 'red', marginLeft: 5 }} allowFontScaling={false}>
+                Cerrar Sesión
+              </Text>
+            )}
             onPress={handleLogout}
-            labelStyle={{ color: 'red', marginLeft: 5 }}
           />
         </View>
       </View>
@@ -347,6 +350,7 @@ const insets = useSafeAreaInsets();
 // de react-navigator, para la navegacion entre pantallas.
 // ruta inicial AuthloadingScreen encargada de vlidar si se encuentra un usuario o no
 const App = () => {
+  
   useEffect(() => {
     // Configurar notificaciones push al inicio
     const registerForPushNotificationsAsync = async () => {
@@ -445,6 +449,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 28,
     height: 28,
+    top: isTablet ? 10 : 0, // 👈 Cambia solo en tablet
   },
   icon2: {
     width: 30,

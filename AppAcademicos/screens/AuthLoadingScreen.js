@@ -27,11 +27,12 @@ const AuthLoadingScreen = () => {
         }
       });
       const eventos = await response.json();
-
+      
       if (eventos && eventos.length > 0) {
         eventos.forEach(evento => {
           const fechaEvento = new Date(evento.Fecha_inicio.replace(' ', 'T') + 'Z'); // Añadimos 'Z' para indicar UTC
           scheduleNotification(evento.Nombre_evento, fechaEvento);
+      
         });
       } else {
         console.log('No hay eventos para mostrar.');
@@ -52,6 +53,7 @@ const AuthLoadingScreen = () => {
       trigger: fechaEvento,
     });
   } else {
+    //console.log(`La fecha del evento "${nombreEvento}" ya ha pasado.`);
 
   }
 };

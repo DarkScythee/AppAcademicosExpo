@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Modal as NativeModal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import { useUser } from '../ManejoDatos';
@@ -11,6 +11,7 @@ const background123 = require('../../imagenes/back.jpg');
 const flecha_blanca = require('../../imagenes/flecha_blanca.png');
 const LupaDirectorio = require('../../imagenes/LupaDirectorio.png');
 const filtrar = require('../../imagenes/flecha_abajo.png');
+const filtroImage = require('../../imagenes/filtrarimage.png');
 
 // Modal icons
 const telefonochico = require('../../imagenes/call.png');
@@ -489,6 +490,11 @@ const filteredData = selected === 'Académicos'
     setIsOpen(!isOpen); 
   };
 
+  const options = [
+    { label: 'Académicos', value: 'Académicos' },
+    { label: 'Estudiantes', value: 'Alumnos' },
+  ];
+
   const handleOpenCargo = (open) => {
   if (Cargos.length > 0) {
     setCargoOpen(open);
@@ -527,33 +533,32 @@ const filteredData = selected === 'Académicos'
       </View>
       {/*Hace visible el filtro entre academicos y alumnos */}
       <TouchableOpacity onPress={toggleMenu}>
-      <Image source={filtrar} style={styles.iconoFiltro}  />
+      <Image source={filtroImage} style={styles.iconoFiltro}  />
       </TouchableOpacity>
 
     </View>
 
     <View style={styles.contenedortodo}>
       
-      <Modal animationType="slide" transparent={true} visible={isOpen}>
+      <NativeModal animationType="fade" transparent={true} visible={isOpen}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            
-            <Text style={styles.title}>Filtros</Text>
-
-            <Text style={styles.label}>Tipo</Text>
-            <DropDownPicker
-              open={dropdownOpen}
-              value={selected}
-              items={[
-                { label: 'Académicos', value: 'Académicos' },
-                { label: 'Alumnos', value: 'Alumnos' },
-              ]}
-              setOpen={setDropdownOpen}
-              setValue={setSelected}
-              setItems={() => {}}
-              zIndex={4000}
-              zIndexInverse={1000}
-            />
+            <View style={styles.filtersContainer}>
+            <Text style={styles.title} allowFontScaling={false}>Filtros</Text>
+             <View style={styles.separator10} />
+            <Text style={styles.label} allowFontScaling={false}>Rol institucional</Text>
+            {options.map((option) => (
+        <TouchableOpacity
+          key={option.value}
+          style={styles.optionContainer}
+          onPress={() => setSelected(option.value)}
+        >
+          <View style={styles.radioCircle}>
+            {selected === option.value && <View style={styles.selectedRb10} />}
+          </View>
+          <Text style={styles.optionLabel10}>{option.label}</Text>
+        </TouchableOpacity>
+      ))}
 
             {/* Unidad - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
@@ -573,6 +578,35 @@ const filteredData = selected === 'Académicos'
             placeholder="Seleccione una unidad"
             zIndex={3000}
             zIndexInverse={2000}
+            style={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+              }}
+              dropDownContainerStyle={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+              }}
+              textStyle={{
+                fontSize: 16,
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+              }}
+              labelStyle={{
+                fontWeight: '500',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+                fontFamily: 'Montserrat-Regular',
+              }}
+              placeholderStyle={{
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+                
+              }}
           />
 
 
@@ -599,11 +633,42 @@ const filteredData = selected === 'Académicos'
             setItems={() => {}}
             zIndex={2000}
             zIndexInverse={2000}
+            style={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+              }}
+              dropDownContainerStyle={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+              }}
+              textStyle={{
+                fontSize: 16,
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+              }}
+              labelStyle={{
+                fontWeight: '500',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+                fontFamily: 'Montserrat-Regular',
+              
+              }}
+              placeholderStyle={{
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+                
+              }}
           />
         </>
       )}
 
       {/* Carrera - solo si se selecciona "Alumnos" */}
+      
       {selected === 'Alumnos' && (
         <>
           <Text style={styles.label}>Carrera</Text>
@@ -622,21 +687,53 @@ const filteredData = selected === 'Académicos'
             searchPlaceholder="Buscar carrera"
             zIndex={1000}
             zIndexInverse={4000}
+            style={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+                
+              }}
+              dropDownContainerStyle={{
+                backgroundColor: '#ffffff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 10,
+                
+              }}
+              textStyle={{
+                fontSize: 16,
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+              }}
+              labelStyle={{
+                fontWeight: '500',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+              }}
+              placeholderStyle={{
+                color: '#000000',
+                fontFamily: 'Montserrat-Regular',
+                allowFontScaling: false, // 👈 Aquí lo aplicas
+                
+              }}
           />
         </>
       )}
-
+      
+          </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
-                <Text style={styles.resetText}>Limpiar</Text>
+                <Text style={styles.resetText} allowFontScaling={false}>Limpiar</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={applyFilters} style={styles.applyButton}>
-                <Text style={styles.applyText}>Aplicar filtros</Text>
+                <Text style={styles.applyText} allowFontScaling={false} >Aplicar filtros</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      </Modal>
+      </NativeModal>
       
     </View>
     
@@ -1143,8 +1240,8 @@ const styles = StyleSheet.create({
     height: 24,
   },
   iconoFiltro: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     marginLeft: 10,
   },
   contenedortodo: {
@@ -1156,68 +1253,117 @@ const styles = StyleSheet.create({
 //otros
 
 modalOverlay: {
-  
-  top: 0,               // Asegura que empieza desde la parte superior de la pantalla
-  left: 0,              // Asegura que empieza desde la parte izquierda
-  right: 0,             // Asegura que llega hasta el borde derecho
-  bottom: 0,            // Asegura que llega hasta el borde inferior
   backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Fondo oscuro con transparencia
   justifyContent: 'center',  // Centra el contenido verticalmente
   alignItems: 'center',      // Centra el contenido horizontalmente
   width: '100%',            // Asegura que ocupe todo el ancho de la pantalla
   height: '100%',           // Asegura que ocupe toda la altura de la pantalla
   alignSelf: 'center',   // Centra el modal horizontalmente en la pantalla
+  
 },
 
   modalContent: {
   backgroundColor: '#fff',
   width: '90%',          // Ajuste para el tamaño del modal
-  height: '70%',
+  height: '65%',
   borderRadius: 10,
   padding: 20,
   elevation: 5,
+
   
 },
 
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 24,
     textAlign: 'center',
+    fontFamily: 'Montserrat-Regular',
   },
   label: {
-    marginTop: 25,
-    fontWeight: '600',
+    fontWeight: '300',
+    fontFamily: 'Montserrat-Regular',
+    color: 'black',
+    marginBottom: 20,
+    paddingTop: 20,
+    fontSize: 18,
+    
   },
   
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 30,
+   
+
   },
   resetButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#ccc',
-    borderRadius: 5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    borderWidth: 0.5,
+    
+    
   },
   applyButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
+    backgroundColor: '#40b9e5',
+    borderRadius: 15,
+    width: '65%',
+    
   },
   resetText: {
-    color: '#333',
+    color: 'black',
+    fontWeight: '600',
+    fontFamily: 'Montserrat-Regular',
+    allowFontScaling: false, 
+    textAlign: 'center',
+    fontSize: 14,
+
   },
   applyText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '800',
+    fontFamily: 'Montserrat-Regular',
+    allowFontScaling: false, 
+    textAlign: 'center',
+    fontSize: 14,
   },
 
-
-
-
+optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  radioCircle: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#1a3d7c',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+selectedRb10: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#1a3d7c',
+  },
+  optionLabel10: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-Regular',
+    color: '#000',
+  },
+  filtersContainer: {
+  flexGrow: 1,
+  justifyContent: 'flex-start',
+},
+separator10: {
+  height: 0.6,
+  backgroundColor: '#000', // Negro
+  marginVertical: 10,      // Espaciado arriba y abajo (ajustable)
+},
 
 });
 

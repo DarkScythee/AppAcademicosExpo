@@ -329,7 +329,7 @@ export class CargaAcademica extends Component {
           <View style={[styles.colorSquare, { backgroundColor: item.color }]}>
           </View>
           <View style={styles.cardContent}>
-            <View>
+             <View style={{ flex: 1, marginRight: 20 }}>
               <Text style={styles.cardText} allowFontScaling={false}>{item.title}</Text>
               <Text style={styles.asignaturasText} allowFontScaling={false}>{item.asignaturas} Asignaturas</Text>
             </View>

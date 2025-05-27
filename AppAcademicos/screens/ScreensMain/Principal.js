@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, Image, ImageBackground, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ImageBackground, Linking, Modal, PixelRatio, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../ManejoDatos';
 
 // imagenes
@@ -24,6 +24,23 @@ const facebook = require('../../imagenes/facebook.png');
 const instagram = require('../../imagenes/instagram.png');
 const tiktok = require('../../imagenes/tiktok.png');
 const linkedin = require('../../imagenes/linkedin.png');
+
+const { width, height } = Dimensions.get('window');
+const fontScale = PixelRatio.getFontScale();
+
+const MIN_PADDING = 10;       // padding mínimo en px
+const MAX_PADDING = 40;       // padding máximo en px
+const BASE_PADDING_PERCENT = 0.08; // 8% del ancho base
+
+// Calcula padding base relativo al ancho
+const basePadding = width * BASE_PADDING_PERCENT;
+
+// Ajusta padding según fontScale, pero con límites mínimos y máximos
+let paddingHorizontal = basePadding / fontScale;
+
+// Limita el padding para que no sea demasiado pequeño ni muy grande
+if (paddingHorizontal < MIN_PADDING) paddingHorizontal = MIN_PADDING;
+if (paddingHorizontal > MAX_PADDING) paddingHorizontal = MAX_PADDING;
 
 // data contiene las paginas principales de los academicos, como su titulo, descripcion y su URL para navegar
 const data = [
@@ -65,6 +82,7 @@ const PantallaPrincipal = () => {
 
 // este renderItem se utiliza para mostrar las paginas web
     const renderItem = ({ item }) => (
+        <View style={styles.profileContainer10}>
         <TouchableOpacity
             style={styles.eventBlock}
             onPress={() => Linking.openURL(item.url)}
@@ -77,10 +95,12 @@ const PantallaPrincipal = () => {
                 <Text style={styles.eventText} allowFontScaling={false}>{item.description}</Text>
             </View>
         </TouchableOpacity>
+        </View>
     );
 
     // este renderitem se utiliza para mostrar el centro de ayuda
     const renderData2Item = ({ item }) => (
+        
         <View style={styles.data2Card}>
             <Text style={styles.data2Title} allowFontScaling={false}>{item.title}</Text>
             <View style={styles.contactContainer}>
@@ -119,7 +139,7 @@ const PantallaPrincipal = () => {
                         <Image source={profileImage} style={styles.profileImage} />
                         <View style={styles.profileTextContainer}>
                             <Text style={styles.profileName} allowFontScaling={false}>{formatUserName(user.cn)}</Text>
-                            <Text style={styles.profileSubtitle}>{`${user.uid}@uct.cl`}</Text>
+                            <Text style={styles.profileSubtitle} allowFontScaling={false}>{`${user.uid}@uct.cl`}</Text>
                         </View>
                     </View>
 
@@ -234,10 +254,10 @@ const styles = StyleSheet.create({
         textAlign: 'left'
     },
     profileImage: {
-        width: 70,
-        height: 70,
+        width: 60,
+        height: 60,
         borderRadius: 35,
-        marginRight: 15,
+        marginRight: 10,
         top: 10,
     },
     ContendorCerrar: {
@@ -264,9 +284,9 @@ const styles = StyleSheet.create({
     title2: {
         color: 'black',
         textAlign: 'left',
-        fontSize: 22,
-        padding: 10,
-        left: 10,
+        fontSize: width * 0.055, // 22 si el ancho es 400
+        padding: width * 0.03,  // 10 si el ancho es 400
+        left: width * 0.04,     // 10 si el ancho es 400
         fontFamily: 'Montserrat-Regular',
     },
     title3: {
@@ -275,7 +295,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         padding: 10,
         fontFamily: 'Montserrat-Regular',
-        left: -10,
+     
     },
     container4: {
         flexDirection: 'row',
@@ -572,6 +592,12 @@ const styles = StyleSheet.create({
         height: 20,
         marginLeft: 10,
         alignSelf: 'center',
+    },
+
+    profileContainer10: {
+        align: 'center',
+        width: '100%', // Asegúrate de que ocupe todo el ancho de la tarjeta
+
     },
 });
 
