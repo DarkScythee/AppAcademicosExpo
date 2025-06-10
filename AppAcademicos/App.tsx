@@ -239,7 +239,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
+      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
     
@@ -284,7 +284,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
+      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -310,7 +310,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
+      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -336,7 +336,7 @@ const insets = useSafeAreaInsets();
       shadowRadius: 3.5,
       backgroundColor: 'white',
       borderRadius: 10,
-      height: isTablet ? 80 : 50, // 👈 Cambia solo en tablet
+      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
       borderWidth: 0.2,
     },
         }} 
@@ -359,7 +359,7 @@ const App = () => {
         if (Platform.OS === 'ios' || Platform.OS === 'android') {
           const { status } = await Notifications.requestPermissionsAsync();
           if (status !== 'granted') {
-            console.log('Permisos de notificación no concedidos');
+            //console.log('Permisos de notificación no concedidos');
             return;
           }
         }
@@ -371,7 +371,7 @@ const App = () => {
 
         // Puedes almacenar el token en un estado o enviarlo a tu servidor si es necesario
       } catch (error) {
-        console.error('Error obtaining notification token:', error);
+        //console.error('Error obtaining notification token:', error);
       }
     };
 
@@ -447,10 +447,12 @@ const styles = StyleSheet.create({
 
   },
   icon: {
-    width: 28,
-    height: 28,
-    top: isTablet ? 10 : 0, // 👈 Cambia solo en tablet
-  },
+  width: 28,
+  height: 28,
+  marginTop: isTablet ? 30 : 10, // 👈 Espaciado fino vertical adaptable
+
+},
+
   icon2: {
     width: 30,
     top: 40,

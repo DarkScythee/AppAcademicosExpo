@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Modal as NativeModal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { ActivityIndicator, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { useUser } from '../ManejoDatos';
 
@@ -37,12 +36,13 @@ const FormularioDirectorio = () => {
   const [loadingA, setLoadingA] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [placeholder, SetPlaceholder] = useState('Buscar academicos');
+  const [placeholder, SetPlaceholder] = useState('Buscar Funcionarios');
   const [unidadD, setUnidadD] = useState('');
   const [cargoD, setCargoD] = useState('');
 
   //Tipo
   const [dropdownOpen, setDropdownOpen] = useState(false); 
+
   //Unidad
   const [UnidadOpen, setUnidadOpen] = useState(false); 
   const [selectedUnidad, setselectedUnidad] = useState(null);
@@ -53,26 +53,54 @@ const FormularioDirectorio = () => {
   const [selectedCargo, setselectedCargo] = useState(null);
   const [Cargos, setCargos] = useState([]);
 
+  // Edificio
+
+  const [EdificioOpen, setEdificioOpen] = useState(false); 
+  const [selectedEdificio, setselectedEdificio] = useState(null);
+  const [Edificio, setEdificio] = useState([]);
+
+  //Campus
+
+  const [CampusOpen, setCampusOpen] = useState(false); 
+  const [selectedCampus, setselectedCampus] = useState(null);
+  const [Campus, setCampus] = useState([]);
+
   //Carrera
   const [CarreraOpen, setCarreraOpen] = useState(false); 
   const [selectedCarrera, setselectedCarrera] = useState(null);
   const [Carrera, setCarrera] = useState([]);
 
+
+  //MODALES
+
+  //Modal 1
+  const [selectedUnidadLabel1, setselectedUnidadLabel1] = useState('');
+  const [showUnidadModal1, setShowUnidadModal1] = useState(false);
+  //Modal 2
+  const [selectedUnidadLabel2, setselectedUnidadLabel2] = useState('');
+  const [showUnidadModal2, setShowUnidadModal2] = useState(false);
+  //Modal 3
+  const [selectedUnidadLabel3, setselectedUnidadLabel3] = useState('');
+  const [showUnidadModal3, setShowUnidadModal3] = useState(false);
+  //Modal 4
+  const [selectedUnidadLabel4, setselectedUnidadLabel4] = useState('');
+  const [showUnidadModal4, setShowUnidadModal4] = useState(false);
+  //Modal 5
+  const [selectedUnidadLabel5, setselectedUnidadLabel5] = useState('');
+  const [showUnidadModal5, setShowUnidadModal5] = useState(false);
+
   useEffect(() => {
+    fetchCargos();
     fetchUnidades();
     fetchCarreras();
+    fetchEdificios();
+    fetchCampus();
+    
   }, []);
 
-  // Detectar cambio
-  useEffect(() => {
-  if (!selectedUnidad) return;
+  //paginacion
+  
 
-  const unidad = unidades.find(u => u.ID.toString() === selectedUnidad);
-  console.log('Unidad seleccionada:', unidad?.DESC_UNIDAD || 'No encontrada');
-  fetchCargos(unidad.DESC_UNIDAD);
-  // Puedes guardar la descripción en otra variable de estado si la necesitas
-  // setDescripcionUnidad(unidad?.DESC_UNIDAD || '');
-}, [selectedUnidad, unidades]);
 
 
   // informacion sobre cada campus de la universidad, contiene la latitud y longitud
@@ -136,29 +164,74 @@ const FormularioDirectorio = () => {
 };
 
 const resetFilters = () => {
-    setSelected('Académicos');
-    setUnidadD('');
-    setCargoD('');
-  };
+  // Reset categoría
+  setSelected('Académicos');
 
-  const applyFilters = () => {
-  // Buscar la unidad seleccionada
-  const unidadSeleccionada = unidades.find(
-    (u) => u.ID.toString() === selectedUnidad
-  );
-  
-  const descripcionUnidad = unidadSeleccionada ? unidadSeleccionada.DESC_UNIDAD : 'No seleccionada';
+  // Reset Unidad
+  setUnidadD('');
+  setselectedUnidad('');
+  setselectedUnidadLabel1('');
 
-  // Mostrar todo en consola
+  // Reset Cargo
+  setCargoD('');
+  setselectedCargo('');
+  setselectedUnidadLabel2('');
+
+  // Reset Edificio
+  setselectedEdificio('');
+  setselectedUnidadLabel3('');
+
+  // Reset Campus
+  setselectedCampus('');
+  setselectedUnidadLabel4('');
+
+  // Reset Carrera
+  setselectedCarrera('');
+  setselectedUnidadLabel5('');
+
+  // Reset TextInput de búsqueda
+  setSearchTerm('');
+
+
+  // Resetear 
+  SetPlaceholder('Buscar Funcionarios');
+
+  // Cerrar modales si estuvieran abiertos (opcional pero útil)
+  setShowUnidadModal1(false);
+  setShowUnidadModal2(false);
+  setShowUnidadModal3(false);
+  setShowUnidadModal4(false);
+  setShowUnidadModal5(false);
+};
+
+
+const applyFilters = () => {
+
+  // Obtener texto de los labels (null si vacío)
+  const unidad = selectedUnidadLabel1 && selectedUnidadLabel1.trim() !== '' ? selectedUnidadLabel1 : 'null';
+  const cargo = selectedUnidadLabel2 && selectedUnidadLabel2.trim() !== '' ? selectedUnidadLabel2 : 'null';
+  const campus = selectedUnidadLabel4 && selectedUnidadLabel4.trim() !== '' ? selectedUnidadLabel4 : 'null';
+  const edificio = selectedUnidadLabel3 && selectedUnidadLabel3.trim() !== '' ? selectedUnidadLabel3 : 'null';
+
+  // Mostrar en consola (debug)
   console.log({
     selected,
-    selectedUnidad, // ID de la unidad
-    descripcionUnidad, // Descripción visible de la unidad
-    cargo
+    unidad,
+    cargo,
+    campus,
+    edificio
   });
 
-  setIsOpen(!isOpen);
+  // Aplicar filtros
+  if (selected === 'Académicos') {
+    fetchDataG(searchTerm); // Llama con string vacío si no hay searchTerm
+  } else if (selected === 'Alumnos') {
+    fetchDataA(searchTerm); // También puedes llamar a fetchDataA sin término
+  }
+
+  setIsOpen(false); // Cierra el modal si es necesario
 };
+
 
 
 function convertirFecha(fecha) {
@@ -195,7 +268,7 @@ function probar(item){
   // Estado y referencia para la animación
   const animationValue = useRef(new Animated.Value(0)).current;
 
-  //Unidades
+ {/*--------------------------------------------UNIDADES SYNC--------------------------------------------- */}
  const fetchUnidades = async () => {
 
   try {
@@ -215,16 +288,24 @@ function probar(item){
     setUnidades(updatedUnidades);  // Guardar el JSON completo en el estado
     //console.log('Unidades cargadas:', updatedUnidades);  // Mostrar el JSON completo en consola
   } catch (error) {
-    console.error('Error fetching unidades:', error);
+    //console.error('Error fetching unidades:', error);
   } finally {
     setIsFetching(false);  // Restablecer el estado de carga
   }
 };
+ {/*--------------------------------------------UNIDADES SYNC--------------------------------------------- */}
 
- //Cargos
-const fetchCargos = async (unidad) => {
+{/*---------------------------------------------CARGOS SYNC--------------------------------------------- */}
+const [page, setPage] = useState(1);
+const [limit, setLimit] = useState(20); // número de ítems por página
+const [isFetching, setIsFetching] = useState(false);
+
+const fetchCargos = async () => {
+  if (isFetching) return; // evita llamadas duplicadas
+
+  setIsFetching(true);
   try {
-    const response = await fetch(`http://192.168.100.4:8000/cargos?unidad=${encodeURIComponent(unidad)}`, {
+    const response = await fetch(`http://192.168.100.4:8000/cargos?page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -233,24 +314,74 @@ const fetchCargos = async (unidad) => {
 
     const data6 = await response.json();
     const updatedUnidades = data6.map(item => ({
-      ...item,  // Mantener todos los campos del item original
-      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+      ...item,
+      ID: item.ID.toString(),
     }));
 
-    setCargos(updatedUnidades);  // Guardar el JSON completo en el estado
-    console.log('Unidades cargadas:', updatedUnidades);  // Mostrar el JSON completo en consola
+    setCargos(prev => (page === 1 ? updatedUnidades : [...prev, ...updatedUnidades]));
   } catch (error) {
-    console.error('Error fetching unidades:', error);
+    console.error('Error fetching cargos:', error);
   } finally {
-    setIsFetching(false);  // Restablecer el estado de carga
+    setIsFetching(false);
   }
 };
 
 
+{/*---------------------------------------------CARGOS SYNC--------------------------------------------- */}
 
+{/*---------------------------------------------EDIFICIOS SYNC--------------------------------------------- */}
+const fetchEdificios = async () => {
+  try {
+    const response = await fetch(`http://192.168.100.4:8000/edificios`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-  // Carreras
+    const data7 = await response.json();
+    const updatedEdificios = data7.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+    }));
 
+    setEdificio(updatedEdificios);  // Guardar el JSON completo en el estado
+    //console.log('Edificios cargadas:', updatedEdificios);  // Mostrar el JSON completo en consola
+  } catch (error) {
+    //console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+{/*---------------------------------------------EDIFICIOS SYNC--------------------------------------------- */}
+
+{/*---------------------------------------------CAMPUS SYNC--------------------------------------------- */}
+const fetchCampus = async () => {
+  try {
+    const response = await fetch(`http://192.168.100.4:8000/campus`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    const updatedCampus = data.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+      ID: item.ID.toString(),  // Asegurarte que ID sea un string
+    }));
+
+    setCampus(updatedCampus);  // Guardar el JSON completo en el estado
+    //console.log('Campus cargadas:', updatedCampus);  // Mostrar el JSON completo en consola
+  } catch (error) {
+    //console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+{/*---------------------------------------------CAMPUS SYNC--------------------------------------------- */}
+
+{/*----------------------------------------------CARRERAS--------------------------------------------- */}
   const fetchCarreras = async () => {
 
   try {
@@ -270,90 +401,145 @@ const fetchCargos = async (unidad) => {
     setCarrera(updatedUnidades5);  // Guardar el JSON completo en el estado
     //console.log('Carreras cargadas:', updatedUnidades5);  // Mostrar el JSON completo en consola
   } catch (error) {
-    console.error('Error fetching unidades:', error);
+    //console.error('Error fetching unidades:', error);
   } finally {
     setIsFetching(false);  // Restablecer el estado de carga
   }
 };
+{/*----------------------------------------------CARRERAS--------------------------------------------- */}
 
+const fetchDataG = async (term) => {
+  setLoading(true);
+  const maxRetries = 3;
+  let attempt = 0;
+  let success = false;
 
-  // Fetch data para los academicos, obtencion de todos sus datos
-  const fetchDataG = async (term) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`https://api-appacademicos.uct.cl/Gdirectorio?search=${term}`, {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type': 'application/json' 
-        }
-      });
-      const result = await response.json();
-      const updatedData = await Promise.all(result.map(async (item) => {
-        const FotoUsuario = item.link_foto; 
-        
-        // Este apartado llama a la foto del academico, si obtiene un error, es por que no hay
-        // y toma la foto not_found, pero si tiene, entonces item.link_foto es la propia foto de la persona
-        // la cual viene de la propia api
-        try {
-            const photoResponse = await fetch(FotoUsuario);
-            if (!photoResponse.ok) {
-                item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg"; 
-            }
-        } catch (err) {
-            item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
-        }
+  // Preparar filtros
+  const unidad = selectedUnidadLabel1 && selectedUnidadLabel1.trim() !== '' ? selectedUnidadLabel1 : 'null';
+  const cargo = selectedUnidadLabel2 && selectedUnidadLabel2.trim() !== '' ? selectedUnidadLabel2 : 'null';
+  const campus = selectedUnidadLabel4 && selectedUnidadLabel4.trim() !== '' ? selectedUnidadLabel4 : 'null';
+  const edificio = selectedUnidadLabel3 && selectedUnidadLabel3.trim() !== '' ? selectedUnidadLabel3 : 'null';
 
-        return item;
-    }));
+  const url = `http://192.168.100.4:8000/directorio?search=${encodeURIComponent(term)}&unidad=${encodeURIComponent(unidad)}&cargo=${encodeURIComponent(cargo)}&campus=${encodeURIComponent(campus)}&edificio=${encodeURIComponent(edificio)}`;
 
-    setData(updatedData);
-   
-    } catch (error) {
-      
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  
-  // Fetch data para los estudiantes, obtencion de todos sus datos
-  const fetchDataA = async (term) => {
-    setLoadingA(true);
-    try {
-        const response = await fetch(`https://api-appacademicos.uct.cl/Adirectorio?search=${term}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`, 
-                'Content-Type': 'application/json' 
-            }
+  try {
+    while (attempt < maxRetries && !success) {
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
         });
-        const result = await response.json();
-        const updatedData = await Promise.all(result.map(async (item) => {
-            const FotoUsuario = item.link_foto; 
 
-        // Este apartado llama a la foto del academico, si obtiene un error, es por que no hay
-        // y toma la foto not_found, pero si tiene, entonces item.link_foto es la propia foto de la persona
-        // la cual viene de la propia api
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.warn("Error del servidor:", errorData);
+          setData([]);
+          return;
+        }
+
+        const result = await response.json();
+
+        if (Array.isArray(result)) {
+          const updatedData = await Promise.all(result.map(async (item) => {
+            const FotoUsuario = item.link_foto;
             try {
-                const photoResponse = await fetch(FotoUsuario);
-                if (!photoResponse.ok) {
-                    item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg"; 
-                }
-            } catch (err) {
+              const photoResponse = await fetch(FotoUsuario, { method: 'HEAD' });
+              if (!photoResponse.ok) {
                 item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+              }
+            } catch (err) {
+              item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
             }
             return item;
-        }));
+          }));
 
-        setDataA(updatedData);
-    } catch (error) {
-        console.error("Error fetching student data:", error);
-    } finally {
-        setLoadingA(false);
+          setData(updatedData);
+        } else {
+          console.warn("Respuesta inesperada:", result);
+          setData([]);
+        }
+
+        success = true;
+      } catch (error) {
+        attempt++;
+        console.warn(`Intento ${attempt} fallido:`, error);
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo antes de reintentar
+        } else {
+          console.error("Error fetching academic data después de varios intentos:", error);
+          setData([]);
+        }
+      }
     }
+  } finally {
+    setLoading(false);
+  }
 };
+
+
+
+
+
+//Alumnos
+ const fetchDataA = async (term) => {
+  setLoadingA(true);
+  try {
+    const carreraValue = selectedUnidadLabel5 && selectedUnidadLabel5.trim() !== '' 
+      ? selectedUnidadLabel5 
+      : 'null'; 
+
+    const response = await fetch(
+      `http://192.168.100.4:8000/Adirectorio?search=${encodeURIComponent(term)}&carrera=${encodeURIComponent(carreraValue)}`, 
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.warn("Error del servidor:", errorData);
+      setDataA([]);
+      return;
+    }
+
+    const result = await response.json();
+
+    if (Array.isArray(result)) {
+      const updatedData = await Promise.all(result.map(async (item) => {
+        const FotoUsuario = item.link_foto;
+        try {
+          const photoResponse = await fetch(FotoUsuario);
+          if (!photoResponse.ok) {
+            item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+          }
+        } catch (err) {
+          item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+        }
+        return item;
+      }));
+      setDataA(updatedData);
+    } else {
+      console.warn("Respuesta inesperada:", result);
+      setDataA([]);
+    }
+  } catch (error) {
+    console.error("Error fetching student data:", error);
+  } finally {
+    setLoadingA(false);
+  }
+};
+
+
+
+
+
 //DEPENDIENDO DE QUE ESCOGE EL USUARIO, UTILIZA UNA DE LOS DOS FETCHDATA, si escoge academicos, data, tendra valores academicos
 // si se escoge Alumnos, entonces data, tendra solo alumnos y se refrescara en la flatlist de manera dinamica  
 useEffect(() => {
@@ -361,14 +547,17 @@ useEffect(() => {
       if (selected === 'Académicos') {
         fetchDataG(searchTerm);
 
+
         
       } else if (selected === 'Alumnos') {
         fetchDataA(searchTerm);
+
         
       } 
     } else {
       setData([]);
       setDataA([]);
+ 
     }
   }, [searchTerm, selected]);
 
@@ -491,18 +680,24 @@ const filteredData = selected === 'Académicos'
   };
 
   const options = [
-    { label: 'Académicos', value: 'Académicos' },
+    { label: 'Funcionarios', value: 'Académicos' },
     { label: 'Estudiantes', value: 'Alumnos' },
   ];
 
-  const handleOpenCargo = (open) => {
-  if (Cargos.length > 0) {
-    setCargoOpen(open);
-  } else {
-    setCargoOpen(false); // O asegúrate que quede cerrado
-    Alert.alert("Ingrese una unidad");
+  const hayFiltrosActivos = () => {
+  if (selected === 'Académicos') {
+    return (
+      selectedUnidadLabel1?.trim() ||
+      selectedUnidadLabel2?.trim() ||
+      selectedUnidadLabel3?.trim() ||
+      selectedUnidadLabel4?.trim()
+    );
+  } else if (selected === 'Alumnos') {
+    return selectedUnidadLabel5?.trim();
   }
+  return false;
 };
+
 
   // Funcion de retorno de todo el componente en si, tanto el buscador, titulos etc.
   return (
@@ -540,18 +735,28 @@ const filteredData = selected === 'Académicos'
 
     <View style={styles.contenedortodo}>
       
-      <NativeModal animationType="fade" transparent={true} visible={isOpen}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.filtersContainer}>
-            <Text style={styles.title} allowFontScaling={false}>Filtros</Text>
+              <Modal
+                isVisible={isOpen}
+                animationIn="slideInRight"
+                animationOut="slideOutRight"
+                backdropOpacity={0.6}
+                onBackdropPress={() => setIsOpen(false)}
+                style={styles.modal32}
+                useNativeDriver={true}
+        >
+          <View style={styles.panel32}>
+            <ScrollView contentContainerStyle={styles.scrollContent32}>
+              <Text style={styles.title} allowFontScaling={false}>Filtros</Text>
              <View style={styles.separator10} />
             <Text style={styles.label} allowFontScaling={false}>Rol institucional</Text>
             {options.map((option) => (
         <TouchableOpacity
           key={option.value}
           style={styles.optionContainer}
-          onPress={() => setSelected(option.value)}
+          onPress={() => {
+            setSelected(option.value);
+            SetPlaceholder(`Buscar ${option.label}`);
+          }}
         >
           <View style={styles.radioCircle}>
             {selected === option.value && <View style={styles.selectedRb10} />}
@@ -560,180 +765,440 @@ const filteredData = selected === 'Académicos'
         </TouchableOpacity>
       ))}
 
-            {/* Unidad - solo si se selecciona "Académicos" */}
+{/*------------------------------------UNIDAD--------------------------------------------*/}
+         {/* Unidad - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
           <Text style={styles.label}>Unidad</Text>
-          <DropDownPicker
-            open={UnidadOpen}
-            value={selectedUnidad}
-            setOpen={setUnidadOpen}
-            setValue={setselectedUnidad}
-            items={unidades.map((item) => ({
-              label: item.DESC_UNIDAD, // El texto que aparece en el dropdown
-              value: item.ID.toString(), // El valor del dropdown
-            }))}
-            searchable={true} // 🔍 habilita la búsqueda automática
-            searchPlaceholder="Buscar unidad"
-            placeholder="Seleccione una unidad"
-            zIndex={3000}
-            zIndexInverse={2000}
+          <TouchableOpacity
+            onPress={() => setShowUnidadModal1(true)} // <-- tu modal personalizado
             style={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-              dropDownContainerStyle={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-              textStyle={{
-                fontSize: 16,
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-              }}
-              labelStyle={{
-                fontWeight: '500',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-                fontFamily: 'Montserrat-Regular',
-              }}
-              placeholderStyle={{
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-                
-              }}
-          />
-
-
-
+              backgroundColor: '#ffffff',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 15,
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 16,
+              color: selectedUnidad ? '#000000' : '#999999',
+              fontFamily: 'Montserrat-Regular',
+            }}>
+              {selectedUnidadLabel1 || 'Seleccione una unidad'}
+            </Text>
+</TouchableOpacity>
         </>
       )}
+      <Modal
+  isVisible={showUnidadModal1}
+  onBackdropPress={() => setShowUnidadModal1(false)}
+  style={{ margin: 0 }} // Ocupa toda la pantalla
+  animationIn="slideInUp"
+  animationOut="slideOutDown"
+>
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Encabezado */}
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona una unidad</Text>
+    </View>
 
+    {/* Lista scrollable */}
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      {unidades.map((item) => (
+        <TouchableOpacity
+          key={item.ID}
+          onPress={() => {
+            setselectedUnidad(item.ID.toString());
+            setselectedUnidadLabel1(item.DESC_UNIDAD);
+            setShowUnidadModal1(false);
+          }}
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>{item.DESC_UNIDAD}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+
+    {/* Botón de cancelar */}
+    <TouchableOpacity
+      onPress={() => setShowUnidadModal1(false)}
+      style={{
+        padding: 20,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+{/*------------------------------------UNIDAD--------------------------------------------*/}
+
+
+{/*------------------------------------CARGO--------------------------------------------*/}
       {/* Cargo - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
           <Text style={styles.label}>Cargo</Text>
-          <DropDownPicker
-            open={CargoOpen}
-            value={selectedCargo}
-            items={Cargos.map((item) => ({
-              label: item.DESC_CARGO, // El texto que aparece en el dropdown
-              value: item.ID.toString(), // El valor del dropdown
-            }))}
-            searchable={true} // 🔍 habilita la búsqueda automática
-            searchPlaceholder="Buscar cargo"
-            placeholder="Selecciona un cargo"
-            setOpen={handleOpenCargo}
-            setValue={setselectedCargo}
-            setItems={() => {}}
-            zIndex={2000}
-            zIndexInverse={2000}
+          <TouchableOpacity
+            onPress={() => setShowUnidadModal2(true)} // <-- tu modal personalizado
             style={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-              dropDownContainerStyle={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-              textStyle={{
-                fontSize: 16,
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-              }}
-              labelStyle={{
-                fontWeight: '500',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-                fontFamily: 'Montserrat-Regular',
-              
-              }}
-              placeholderStyle={{
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-                
-              }}
-          />
+              backgroundColor: '#ffffff',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 15,
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 16,
+              color: selectedCargo ? '#000000' : '#999999',
+              fontFamily: 'Montserrat-Regular',
+            }}>
+              {selectedUnidadLabel2 || 'Seleccione un cargo'}
+            </Text>
+</TouchableOpacity>
         </>
       )}
+      <Modal
+  isVisible={showUnidadModal2}
+  onBackdropPress={() => setShowUnidadModal2(false)}
+  style={{ margin: 0 }}
+  animationIn="slideInUp"
+  animationOut="slideOutDown"
+>
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Encabezado */}
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un Cargo</Text>
+    </View>
 
+    {/* FlatList para scroll infinito */}
+    <FlatList
+      data={Cargos}
+      keyExtractor={(item) => item.ID.toString()}
+      contentContainerStyle={{ padding: 20 }}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() => {
+            setselectedCargo(item.ID.toString());
+            setselectedUnidadLabel2(item.DESC_CARGO);
+            setShowUnidadModal2(false);
+          }}
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>{item.DESC_CARGO}</Text>
+        </TouchableOpacity>
+      )}
+      onEndReached={() => {
+        if (!isFetching) {
+          setPage((prev) => prev + 1);
+          fetchCargos();
+        }
+      }}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={isFetching ? (
+        <Text style={{ textAlign: 'center', padding: 10 }}>Cargando más...</Text>
+      ) : null}
+    />
+
+    {/* Botón de cancelar */}
+    <TouchableOpacity
+      onPress={() => setShowUnidadModal2(false)}
+      style={{
+        padding: 20,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+
+{/*------------------------------------CARGO--------------------------------------------*/}      
+
+{/*------------------------------------EDIFICIO--------------------------------------------*/} 
+      {/* Edificio - solo si se selecciona "Académicos" */}
+      {selected === 'Académicos' && (
+        <>
+          <Text style={styles.label}>Edificio</Text>
+          <TouchableOpacity
+            onPress={() => setShowUnidadModal3(true)} // <-- tu modal personalizado
+            style={{
+              backgroundColor: '#ffffff',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 15,
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 16,
+              color: selectedEdificio ? '#000000' : '#999999',
+              fontFamily: 'Montserrat-Regular',
+            }}>
+              {selectedUnidadLabel3 || 'Seleccione un edificio'}
+            </Text>
+</TouchableOpacity>
+        </>
+      )}
+      <Modal
+  isVisible={showUnidadModal3}
+  onBackdropPress={() => setShowUnidadModal3(false)}
+  style={{ margin: 0 }} // Ocupa toda la pantalla
+  animationIn="slideInUp"
+  animationOut="slideOutDown"
+>
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Encabezado */}
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un edificio</Text>
+    </View>
+
+    {/* Lista scrollable */}
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      {Edificio.map((item) => (
+        <TouchableOpacity
+          key={item.ID}
+          onPress={() => {
+            setselectedEdificio(item.ID.toString());
+            setselectedUnidadLabel3(item.DESC_EDIFICIO);
+            setShowUnidadModal3(false);
+          }}
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>{item.DESC_EDIFICIO}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+
+    {/* Botón de cancelar */}
+    <TouchableOpacity
+      onPress={() => setShowUnidadModal3(false)}
+      style={{
+        padding: 20,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+{/*------------------------------------EDIFICIO--------------------------------------------*/} 
+
+
+{/*------------------------------------CAMPUS--------------------------------------------*/} 
+      {/* Campus - solo si se selecciona "Académicos" */}
+      {selected === 'Académicos' && (
+        <>
+          <Text style={styles.label}>Campus</Text>
+          <TouchableOpacity
+            onPress={() => setShowUnidadModal4(true)} // <-- tu modal personalizado
+            style={{
+              backgroundColor: '#ffffff',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 15,
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 16,
+              color: selectedCampus ? '#000000' : '#999999',
+              fontFamily: 'Montserrat-Regular',
+            }}>
+              {selectedUnidadLabel4 || 'Seleccione un campus'}
+            </Text>
+</TouchableOpacity>
+        </>
+      )}
+      <Modal
+  isVisible={showUnidadModal4}
+  onBackdropPress={() => setShowUnidadModal4(false)}
+  style={{ margin: 0 }} // Ocupa toda la pantalla
+  animationIn="slideInUp"
+  animationOut="slideOutDown"
+>
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Encabezado */}
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un campus</Text>
+    </View>
+
+    {/* Lista scrollable */}
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      {Campus.map((item) => (
+        <TouchableOpacity
+          key={item.ID}
+          onPress={() => {
+            setselectedCampus(item.ID.toString());
+            setselectedUnidadLabel4(item.DESC_CAMPUS);
+            setShowUnidadModal4(false);
+          }}
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>{item.DESC_CAMPUS}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+
+    {/* Botón de cancelar */}
+    <TouchableOpacity
+      onPress={() => setShowUnidadModal4(false)}
+      style={{
+        padding: 20,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+{/*------------------------------------CAMPUS--------------------------------------------*/} 
+
+{/*------------------------------------CARRERA--------------------------------------------*/} 
       {/* Carrera - solo si se selecciona "Alumnos" */}
       
       {selected === 'Alumnos' && (
         <>
           <Text style={styles.label}>Carrera</Text>
-          <DropDownPicker
-            open={CarreraOpen}
-            value={selectedCarrera}
-            items={Carrera.map((item) => ({
-              label: item.NOM_CARRERA, // El texto que aparece en el dropdown
-              value: item.ID.toString(), // El valor del dropdown
-            }))}
-            setOpen={setCarreraOpen}
-            setValue={setselectedCarrera}
-            setItems={() => {}}
-            searchable={true} // 👈 Habilita la búsqueda
-            placeholder="Selecciona una carrera"
-            searchPlaceholder="Buscar carrera"
-            zIndex={1000}
-            zIndexInverse={4000}
+          <TouchableOpacity
+            onPress={() => setShowUnidadModal5(true)} // <-- tu modal personalizado
             style={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-                
-              }}
-              dropDownContainerStyle={{
-                backgroundColor: '#ffffff',
-                borderColor: '#ccc',
-                borderWidth: 1,
-                borderRadius: 10,
-                
-              }}
-              textStyle={{
-                fontSize: 16,
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-              }}
-              labelStyle={{
-                fontWeight: '500',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-              }}
-              placeholderStyle={{
-                color: '#000000',
-                fontFamily: 'Montserrat-Regular',
-                allowFontScaling: false, // 👈 Aquí lo aplicas
-                
-              }}
-          />
+              backgroundColor: '#ffffff',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 15,
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 16,
+              color: selectedCarrera ? '#000000' : '#999999',
+              fontFamily: 'Montserrat-Regular',
+            }}>
+              {selectedUnidadLabel5 || 'Seleccione un carrera'}
+            </Text>
+</TouchableOpacity>
         </>
       )}
-      
-          </View>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
-                <Text style={styles.resetText} allowFontScaling={false}>Limpiar</Text>
+      <Modal
+  isVisible={showUnidadModal5}
+  onBackdropPress={() => setShowUnidadModal5(false)}
+  style={{ margin: 0 }} // Ocupa toda la pantalla
+  animationIn="slideInUp"
+  animationOut="slideOutDown"
+>
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Encabezado */}
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona una carrera</Text>
+    </View>
+
+    {/* Lista scrollable */}
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      {Carrera.map((item) => (
+        <TouchableOpacity
+          key={item.ID}
+          onPress={() => {
+            setselectedCarrera(item.ID.toString());
+            setselectedUnidadLabel5(item.NOM_CARRERA);
+            setShowUnidadModal5(false);
+          }}
+          style={{
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+          }}
+        >
+          <Text style={{ fontSize: 16 }}>{item.NOM_CARRERA}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+
+    {/* Botón de cancelar */}
+    <TouchableOpacity
+      onPress={() => setShowUnidadModal5(false)}
+      style={{
+        padding: 20,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+{/*------------------------------------CARRERA--------------------------------------------*/} 
+
+          
+      {/*---------------------------------------------------------------------------------------- */}
+            </ScrollView>
+            <View style={styles.separator10} />
+            <View style={styles.buttonRow32}>
+              <TouchableOpacity onPress={resetFilters} style={styles.resetButton32}>
+                <Text style={styles.resetText32} allowFontScaling={false}>Limpiar filtros</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={applyFilters} style={styles.applyButton}>
-                <Text style={styles.applyText} allowFontScaling={false} >Aplicar filtros</Text>
+              <TouchableOpacity
+                onPress={applyFilters}
+                style={[
+                  styles.applyButton32,
+                  !hayFiltrosActivos() && { backgroundColor: '#ccc' } // gris si deshabilitado
+                ]}
+                disabled={!hayFiltrosActivos()}
+              >
+                <Text
+                  style={[
+                    styles.applyText32,
+                    !hayFiltrosActivos() && { color: '#888' } // texto más claro si deshabilitado
+                  ]}
+                  allowFontScaling={false}
+                >
+                  Mostrar
+                </Text>
               </TouchableOpacity>
+
             </View>
+            <View style={styles.separator10} />
+            
           </View>
-        </View>
-      </NativeModal>
+          
+        </Modal>
       
     </View>
     
@@ -1224,6 +1689,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     zIndex: 1,
+    marginLeft: 10,
   },
   inputEstilo: {
     flex: 1,
@@ -1360,11 +1826,66 @@ selectedRb10: {
   justifyContent: 'flex-start',
 },
 separator10: {
-  height: 0.6,
+  height: 0.3,
+  
   backgroundColor: '#000', // Negro
   marginVertical: 10,      // Espaciado arriba y abajo (ajustable)
 },
 
+
+
+
+
+
+
+// PRUEBAS
+
+modal32: {
+    margin: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  panel32: {
+    width: '80%',
+    height: '100%',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 40,
+    borderLeftWidth: 1,
+    borderColor: '#ccc',
+  },
+  scrollContent32: {
+    paddingBottom: 100, // para no tapar con los botones
+  },
+  buttonRow32: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    
+  },
+  resetButton32: {
+    
+    padding: 10,
+    borderRadius: 8,
+    
+  },
+  resetText32: {
+    color: '#000',
+    
+  },
+  applyButton32: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    width: '50%',
+    borderRadius: 8,
+    
+  },
+  applyText32: {
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Montserrat-Regular',
+    
+  },
 });
 
 export default FormularioDirectorio;

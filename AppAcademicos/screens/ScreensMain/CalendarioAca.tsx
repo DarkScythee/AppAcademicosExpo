@@ -95,8 +95,8 @@ const CalendarioAca = () => {
     fetchGoogleEvents()
   ]);
 
-  console.log('✅ Eventos desde la API:', apiData.length, apiData);
-  console.log('✅ Eventos desde Google:', googleData.length, googleData);
+  //console.log('Eventos desde la API:', apiData.length, apiData);
+  //console.log('Eventos desde Google:', googleData.length, googleData);
 
   processEventsData(apiData, googleData);
   setLoading(false);
@@ -204,7 +204,7 @@ const CalendarioAca = () => {
   const startStr = event.start?.dateTime || event.start?.date;
   const endStr = event.end?.dateTime || event.end?.date;
 
-  if (!startStr) return; // 🚫 Ignora eventos sin fecha de inicio
+  if (!startStr) return; // Ignora eventos sin fecha de inicio
 
   const startDate = moment(startStr).format('YYYY-MM-DD');
   const startEvent: MergedEvent = {
@@ -354,6 +354,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,  // Permite que el texto ocupe el espacio disponible
+    marginRight: 25,
   },
   loaderestilo:{
     flex: 1,
