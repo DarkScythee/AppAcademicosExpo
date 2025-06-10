@@ -410,7 +410,7 @@ const fetchCampus = async () => {
 
 const fetchDataG = async (term) => {
   setLoading(true);
-  const maxRetries = 3;
+  const maxRetries = 5;
   let attempt = 0;
   let success = false;
 
@@ -484,57 +484,76 @@ const fetchDataG = async (term) => {
 
 
 //Alumnos
- const fetchDataA = async (term) => {
+const fetchDataA = async (term) => {
   setLoadingA(true);
-  try {
-    const carreraValue = selectedUnidadLabel5 && selectedUnidadLabel5.trim() !== '' 
-      ? selectedUnidadLabel5 
-      : 'null'; 
+  const maxRetries = 5;
+  let attempt = 0;
+  let success = false;
 
-    const response = await fetch(
-      `http://192.168.100.4:8000/Adirectorio?search=${encodeURIComponent(term)}&carrera=${encodeURIComponent(carreraValue)}`, 
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type': 'application/json'
+  // Preparar filtro
+  const carreraValue = selectedUnidadLabel5 && selectedUnidadLabel5.trim() !== '' 
+    ? selectedUnidadLabel5 
+    : 'null';
+
+  const url = `http://192.168.100.4:8000/Adirectorio?search=${encodeURIComponent(term)}&carrera=${encodeURIComponent(carreraValue)}`;
+
+  try {
+    while (attempt < maxRetries && !success) {
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.warn("Error del servidor:", errorData);
+          setDataA([]);
+          return;
+        }
+
+        const result = await response.json();
+
+        if (Array.isArray(result)) {
+          const updatedData = await Promise.all(result.map(async (item) => {
+            const FotoUsuario = item.link_foto;
+            try {
+              const photoResponse = await fetch(FotoUsuario, { method: 'HEAD' });
+              if (!photoResponse.ok) {
+                item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+              }
+            } catch (err) {
+              item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+            }
+            return item;
+          }));
+
+          setDataA(updatedData);
+        } else {
+          console.warn("Respuesta inesperada:", result);
+          setDataA([]);
+        }
+
+        success = true;
+      } catch (error) {
+        attempt++;
+        console.warn(`Intento ${attempt} fallido:`, error);
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo
+        } else {
+          console.error("Error fetching student data después de varios intentos:", error);
+          setDataA([]);
         }
       }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.warn("Error del servidor:", errorData);
-      setDataA([]);
-      return;
     }
-
-    const result = await response.json();
-
-    if (Array.isArray(result)) {
-      const updatedData = await Promise.all(result.map(async (item) => {
-        const FotoUsuario = item.link_foto;
-        try {
-          const photoResponse = await fetch(FotoUsuario);
-          if (!photoResponse.ok) {
-            item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
-          }
-        } catch (err) {
-          item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
-        }
-        return item;
-      }));
-      setDataA(updatedData);
-    } else {
-      console.warn("Respuesta inesperada:", result);
-      setDataA([]);
-    }
-  } catch (error) {
-    console.error("Error fetching student data:", error);
   } finally {
     setLoadingA(false);
   }
 };
+
 
 
 
