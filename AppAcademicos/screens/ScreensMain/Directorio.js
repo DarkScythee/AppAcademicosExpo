@@ -314,9 +314,9 @@ const fetchCargos = async () => {
 
     const data6 = await response.json();
     const updatedUnidades = data6.map(item => ({
-      ...item,
-      ID: item.ID.toString(),
-    }));
+  ...item,
+  ID: `${page}-${item.ID}`,  // ahora ID es algo como '1-1', '1-2', '2-1', '2-2', etc.
+}));
 
     setCargos(prev => (page === 1 ? updatedUnidades : [...prev, ...updatedUnidades]));
   } catch (error) {
@@ -1210,7 +1210,7 @@ const filteredData = selected === 'Académicos'
   keyExtractor={(item, index) => index.toString()}
   ListEmptyComponent={loading || loadingA ? <ActivityIndicator size="large" color="#0000ff" /> : renderEmptyComponent()}
   style={{ width: '100%'}} 
-  contentContainerStyle={{ paddingBottom: 60}}
+  contentContainerStyle={{ paddingBottom: 100}}
 />
 
 {/*De los academicos o estudiantes cargados al momento de buscar, si se pulsa uno

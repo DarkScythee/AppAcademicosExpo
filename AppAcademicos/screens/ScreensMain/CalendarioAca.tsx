@@ -1,7 +1,11 @@
 import moment from 'moment';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Easing, Image, ImageSourcePropType, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, Easing, Image, ImageSourcePropType, Linking, LogBox, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AgendaList, CalendarProvider, ExpandableCalendar, LocaleConfig } from 'react-native-calendars';
+
+LogBox.ignoreLogs([
+  'Warning: useInsertionEffect must not schedule updates.'
+]);
 
 LocaleConfig.locales['es'] = {
   monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
