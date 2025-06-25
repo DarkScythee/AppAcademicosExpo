@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { useUser } from '../ManejoDatos';
 
@@ -70,6 +70,9 @@ const FormularioDirectorio = () => {
   const [selectedCarrera, setselectedCarrera] = useState(null);
   const [Carrera, setCarrera] = useState([]);
 
+  //Lat,Long
+  const [datalatitud, Setdatalatitud] = useState([]);
+
 
   //MODALES
 
@@ -88,6 +91,15 @@ const FormularioDirectorio = () => {
   //Modal 5
   const [selectedUnidadLabel5, setselectedUnidadLabel5] = useState('');
   const [showUnidadModal5, setShowUnidadModal5] = useState(false);
+  //Filtros mostrar
+  const [listaFinal, setListaFinal] = useState([]);
+  const [seleccionados, setSeleccionados] = useState({
+  unidad: null,
+  cargo: null,
+  edificio: null,
+  campus: null,
+  carrera: null,
+});
 
   useEffect(() => {
     fetchCargos();
@@ -98,55 +110,7 @@ const FormularioDirectorio = () => {
     
   }, []);
 
-  //paginacion
   
-
-
-
-  // informacion sobre cada campus de la universidad, contiene la latitud y longitud
-  // la cual sirve para que una funcion las tome, y las guarde y las pase como parametro
-  // a una URL en google maps y redireccione a dicha ubicacion.
-
-  const campusUrls = [
-    // SAN FRANCISCO    
-    { code: 'CSF01 - CAEP (P)', variables: '-38.73703, -72.60164' },
-    { code: 'CSF07 - CASA PASTORAL', variables: '-38.73789, -72.60234' },
-    { code: 'CSF16 - EDIF. CLOTARIO BLEST (A)', variables: '-38.73780, -72.60136' },
-    { code: 'CSF14 - EDIF. PABLO ANDRES ARNAUDON (B)', variables: '-38.73826, -72.60153' },
-    { code: 'CSF12 - EDIF. TERESA DURAN (C)', variables: '-38.73873, -72.60165' },
-    { code: 'CSF11 - EDIF. CARDENAL RAUL SILVA HENRIQ', variables: '-38.73862, -72.60219' },
-    { code: 'EDIFICIO E', variables: '-38.73764, -72.60216' },
-    { code: 'CSF17 - EDIF. K', variables: '-38.73738, -72.60131' },
-    { code: 'CSF13 - EDIF. RONALDO MUÚOZ', variables: '-38.73854, -72.60160' },
-    { code: 'CSF15 - GIMNASIO', variables: '-38.73803, -72.60152' },
-    { code: 'CSF09 - MONSEÚOR HECTOR VARGAS BASTIDAS', variables: '-38.73841, -72.60234' },
-    { code: 'CSF08 - DARA', variables: '-38.73803, -72.60239' },
-    { code: 'CSF05 - CASA DOCENCIA (F)', variables: '-38.73796, -72.60218' },
-    { code: 'EDIFICIO FAC. CS. RELIGIOSAS', variables: '-38.73854, -72.60160' },
-    //san juan pablo II
-    { code: 'CJP12 - COMPLEJO DEPORTIVO', variables: '-38.700998162215484, -72.54621942835269' },
-    { code: 'CJP11 - DIDACTICA', variables: '-38.70146455464285, -72.54685468133799' },
-    { code: 'CJP08 - EDIF. EDIF. ADALBERTO SALAS (CT)', variables: '-38.70246722817965, -72.54821955632919' },
-    { code: 'CJP03 - EDIF. AGUSTINA HIDALGO (EDU)', variables: '-38.703920912992096, -72.54867434373708' },
-    { code: 'CJP10 - EDIF. WALDO MARCHANT (CT+)', variables: '-38.70202736420557, -72.54753211613357' },
-    { code: 'EDIFICIO ACUICULTURA', variables: '-38.70345858106157, -72.54881730941581' },
-    { code: 'CJP01 - FAAD', variables: '-38.70405195685031, -72.54954049486236' },
-    { code: 'CJP02 - EDIF. DISEÚO', variables: '-38.70385680268979, -72.5492971801243' },
-    { code: 'CJP04 - PORTAL DEL ESTUDIANTE Y ACUICULT', variables: '-38.70345858106157, -72.54881730941581' },
-    { code: 'CJP07 - EDIF. RICARDO FERRANDO', variables: '-38.7031473864542, -72.54923297206464' },
-    // LUIS RIVAS DEL CANTO
-    { code: 'CRC05 - EDIF. ANATOMIA', variables: '-38.70167, -72.54908' },
-    { code: 'CRC07 - CLINICA MAYOR', variables: '-38.70079, -72.54807' },
-    { code: 'CRC01 - CLINICA MENOR', variables: '-38.70283, -72.55038' },
-    { code: 'CRC09 -EDIF. INSTITUCIONAL', variables: '-38.69879, -72.54630' },
-    { code: 'CRC03 - EDIFICIO MODULO ACADEMICO', variables: '-38.70246, -72.55016' },
-    { code: 'CRC06 - EDIF. PATOBIOLOGÍA', variables: '-38.70141, -72.54879' },
-    { code: 'CRC08 - CASA VRAE', variables: '-38.69897, -72.54676' },
-    { code: 'CRC17 - GALPON 1 CHICO', variables: '-38.69738, -72.54673' },
-    { code: 'VETERINARIA', variables: '-38.70217, -72.54964' },  
-    //33 edificios
-    ];
-
 // Meses del año para mostrar el cumpleaños del academico
   const meses = {
     '01': 'ENERO',
@@ -202,6 +166,11 @@ const resetFilters = () => {
   setShowUnidadModal3(false);
   setShowUnidadModal4(false);
   setShowUnidadModal5(false);
+
+  setListaFinal([]);
+  setSeleccionados([]);
+  setData([]);
+
 };
 
 
@@ -230,8 +199,9 @@ const applyFilters = () => {
   }
 
   setIsOpen(false); // Cierra el modal si es necesario
-};
+  setListaFinal(Object.values(seleccionados).filter(Boolean));
 
+};
 
 
 function convertirFecha(fecha) {
@@ -249,30 +219,67 @@ function probar(item){
   return convertirFecha(item);
 };
 
-// En este apartado toma las variables que son las latiutdes y longitudes
-// yla cual sirve para obtener el parametro fechas y enviarlo a la API de google maps
-
-  const getCampusUrlFromData = (campusCode) => {
-    const campus = campusUrls.find(c => c.code === campusCode);
-    return campus ? campus.variables : 'Localizacion no encontrada';
-  };
 
 // Retorna a Google Maps con las latitudes y longitudes
-  const PruebaVariable = (code) => {
-    const fechas = getCampusUrlFromData(code);
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${fechas}`;
-    Linking.openURL(url).catch(err => console.error('Error opening map: ', err));
-    console.log(fechas);
-  };
+const PruebaVariable = async (code) => {
+  const fechas = await fetchUbicaciones2(code);
+  console.log(fechas);
+
+  // Verifica si se recibió al menos una ubicación
+if (!fechas || fechas.length === 0) {
+  Alert.alert(
+    'Ubicación no encontrada',
+    'No pudimos encontrar información de ubicación para el funcionario correspondiente.'
+  );
+  return;
+}
+
+
+  const { latitud_edificio, longitud_edificio } = fechas[0]; // Tomamos la primera ubicación
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${latitud_edificio},${longitud_edificio}`;
+
+  Linking.openURL(url).catch(err => console.error('Error opening map: ', err));
+};
+
 
   // Estado y referencia para la animación
   const animationValue = useRef(new Animated.Value(0)).current;
+
+
+{/*--------------------------------------------Ubicaciones SYNC--------------------------------------------- */}
+const fetchUbicaciones2 = async (term) => {
+  try {
+    const response = await fetch(`https://api-appacademicos.uct.cl/ubicacioneslatlon?inmu_sigla=${encodeURIComponent(term)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data7 = await response.json();
+
+    const datatodo = data7.map(item => ({
+      ...item,  // Mantener todos los campos del item original
+    }));
+
+    Setdatalatitud(datatodo);  // Guardar el JSON completo en el estado
+    //console.log('Ubicaciones cargadas:', datatodo);  // Mostrar el JSON completo en consola
+    return datatodo; // <-- ¡IMPORTANTE!
+  } catch (error) {
+    console.error('Error fetching unidades:', error);
+  } finally {
+    setIsFetching(false);  // Restablecer el estado de carga
+  }
+};
+{/*--------------------------------------------Ubicaciones SYNC--------------------------------------------- */}
+
+
 
  {/*--------------------------------------------UNIDADES SYNC--------------------------------------------- */}
  const fetchUnidades = async () => {
 
   try {
-    const response = await fetch('http://192.168.100.4:8000/unidades', {
+    const response = await fetch('https://api-appacademicos.uct.cl/unidades', {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -296,35 +303,54 @@ function probar(item){
  {/*--------------------------------------------UNIDADES SYNC--------------------------------------------- */}
 
 {/*---------------------------------------------CARGOS SYNC--------------------------------------------- */}
-const [page, setPage] = useState(1);
-const [limit, setLimit] = useState(20); // número de ítems por página
 const [isFetching, setIsFetching] = useState(false);
+const [retryCount, setRetryCount] = useState(0);
+const maxRetries = 5;
 
 const fetchCargos = async () => {
-  if (isFetching) return; // evita llamadas duplicadas
+  if (isFetching) return; // evitar llamadas simultáneas
 
   setIsFetching(true);
+
   try {
-    const response = await fetch(`http://192.168.100.4:8000/cargos?page=${page}&limit=${limit}`, {
+    const response = await fetch(`https://api-appacademicos.uct.cl/cargos`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
 
-    const data6 = await response.json();
-    const updatedUnidades = data6.map(item => ({
-  ...item,
-  ID: `${page}-${item.ID}`,  // ahora ID es algo como '1-1', '1-2', '2-1', '2-2', etc.
-}));
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    setCargos(prev => (page === 1 ? updatedUnidades : [...prev, ...updatedUnidades]));
+    const data6 = await response.json();
+
+    const updatedUnidades = data6.map(item => ({
+      ...item,
+      ID: item.ID.toString(), // asumiendo que ya son únicos
+    }));
+
+    setCargos(updatedUnidades);
+    setRetryCount(0); // reset retry count al tener éxito
+
   } catch (error) {
-    console.error('Error fetching cargos:', error);
+    //console.error('Error fetching cargos:', error);
+
+    if (retryCount < maxRetries) {
+      setRetryCount(prev => prev + 1);
+      // Reintentar después de 1 segundo
+      setTimeout(() => {
+        fetchCargos();
+      }, 1000);
+    } else {
+      console.error('Máximo número de reintentos alcanzado.');
+    }
   } finally {
     setIsFetching(false);
   }
 };
+
 
 
 {/*---------------------------------------------CARGOS SYNC--------------------------------------------- */}
@@ -332,7 +358,7 @@ const fetchCargos = async () => {
 {/*---------------------------------------------EDIFICIOS SYNC--------------------------------------------- */}
 const fetchEdificios = async () => {
   try {
-    const response = await fetch(`http://192.168.100.4:8000/edificios`, {
+    const response = await fetch(`https://api-appacademicos.uct.cl/edificios`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -358,7 +384,7 @@ const fetchEdificios = async () => {
 {/*---------------------------------------------CAMPUS SYNC--------------------------------------------- */}
 const fetchCampus = async () => {
   try {
-    const response = await fetch(`http://192.168.100.4:8000/campus`, {
+    const response = await fetch(`https://api-appacademicos.uct.cl/campus`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -385,7 +411,7 @@ const fetchCampus = async () => {
   const fetchCarreras = async () => {
 
   try {
-    const response = await fetch('http://192.168.100.4:8000/obtenerCarrera', {
+    const response = await fetch('https://api-appacademicos.uct.cl/obtenerCarrera', {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -420,7 +446,7 @@ const fetchDataG = async (term) => {
   const campus = selectedUnidadLabel4 && selectedUnidadLabel4.trim() !== '' ? selectedUnidadLabel4 : 'null';
   const edificio = selectedUnidadLabel3 && selectedUnidadLabel3.trim() !== '' ? selectedUnidadLabel3 : 'null';
 
-  const url = `http://192.168.100.4:8000/directorio?search=${encodeURIComponent(term)}&unidad=${encodeURIComponent(unidad)}&cargo=${encodeURIComponent(cargo)}&campus=${encodeURIComponent(campus)}&edificio=${encodeURIComponent(edificio)}`;
+  const url = `https://api-appacademicos.uct.cl/directorio?search=${encodeURIComponent(term)}&unidad=${encodeURIComponent(unidad)}&cargo=${encodeURIComponent(cargo)}&campus=${encodeURIComponent(campus)}&edificio=${encodeURIComponent(edificio)}`;
 
   try {
     while (attempt < maxRetries && !success) {
@@ -495,7 +521,7 @@ const fetchDataA = async (term) => {
     ? selectedUnidadLabel5 
     : 'null';
 
-  const url = `http://192.168.100.4:8000/Adirectorio?search=${encodeURIComponent(term)}&carrera=${encodeURIComponent(carreraValue)}`;
+  const url = `https://api-appacademicos.uct.cl/Adirectorio?search=${encodeURIComponent(term)}&carrera=${encodeURIComponent(carreraValue)}`;
 
   try {
     while (attempt < maxRetries && !success) {
@@ -570,7 +596,7 @@ useEffect(() => {
         
       } else if (selected === 'Alumnos') {
         fetchDataA(searchTerm);
-
+        
         
       } 
     } else {
@@ -717,7 +743,6 @@ const filteredData = selected === 'Académicos'
   return false;
 };
 
-
   // Funcion de retorno de todo el componente en si, tanto el buscador, titulos etc.
   return (
     <View style={styles.container}>
@@ -746,11 +771,29 @@ const filteredData = selected === 'Académicos'
         )}
       </View>
       {/*Hace visible el filtro entre academicos y alumnos */}
-      <TouchableOpacity onPress={toggleMenu}>
+      <TouchableOpacity onPress={toggleMenu} style={{ marginRight: 10 }}>
       <Image source={filtroImage} style={styles.iconoFiltro}  />
       </TouchableOpacity>
 
     </View>
+    
+       {listaFinal.length > 0 && (
+  <View style={{ marginBottom: 1 }}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scrollContainer}
+    >
+      {listaFinal.map((nombre, i) => (
+        <View key={i} style={styles.tag2}>
+          <Text style={styles.tagText2} allowFontScaling={false}>{nombre}</Text>
+        </View>
+      ))}
+    </ScrollView>
+  </View>
+)}
+
+
 
     <View style={styles.contenedortodo}>
       
@@ -775,12 +818,17 @@ const filteredData = selected === 'Académicos'
           onPress={() => {
             setSelected(option.value);
             SetPlaceholder(`Buscar ${option.label}`);
-          }}
-        >
+  
+            if (option.value === 'Académicos' || option.value === 'Alumnos') {
+                  setListaFinal([]);
+                  setSeleccionados([]);
+                }
+              }}
+            >
           <View style={styles.radioCircle}>
             {selected === option.value && <View style={styles.selectedRb10} />}
           </View>
-          <Text style={styles.optionLabel10}>{option.label}</Text>
+          <Text style={styles.optionLabel10} allowFontScaling={false}>{option.label}</Text>
         </TouchableOpacity>
       ))}
 
@@ -788,7 +836,7 @@ const filteredData = selected === 'Académicos'
          {/* Unidad - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
-          <Text style={styles.label}>Unidad</Text>
+          <Text style={styles.label} allowFontScaling={false}>Unidad</Text>
           <TouchableOpacity
             onPress={() => setShowUnidadModal1(true)} // <-- tu modal personalizado
             style={{
@@ -805,7 +853,7 @@ const filteredData = selected === 'Académicos'
               fontSize: 16,
               color: selectedUnidad ? '#000000' : '#999999',
               fontFamily: 'Montserrat-Regular',
-            }}>
+            }} allowFontScaling={false}>
               {selectedUnidadLabel1 || 'Seleccione una unidad'}
             </Text>
 </TouchableOpacity>
@@ -818,10 +866,10 @@ const filteredData = selected === 'Académicos'
   animationIn="slideInUp"
   animationOut="slideOutDown"
 >
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={{ flex: 1, backgroundColor: '#fff', paddingBottom: 20 }}>
     {/* Encabezado */}
-    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona una unidad</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee', marginTop: Platform.OS === 'ios' ? 50 : 30, }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona una unidad</Text>
     </View>
 
     {/* Lista scrollable */}
@@ -833,6 +881,8 @@ const filteredData = selected === 'Académicos'
             setselectedUnidad(item.ID.toString());
             setselectedUnidadLabel1(item.DESC_UNIDAD);
             setShowUnidadModal1(false);
+            setSeleccionados(prev => ({ ...prev, unidad: item.DESC_UNIDAD }));
+
           }}
           style={{
             paddingVertical: 15,
@@ -840,7 +890,7 @@ const filteredData = selected === 'Académicos'
             borderColor: '#eee',
           }}
         >
-          <Text style={{ fontSize: 16 }}>{item.DESC_UNIDAD}</Text>
+          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_UNIDAD}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -855,7 +905,7 @@ const filteredData = selected === 'Académicos'
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+      <Text style={{ fontSize: 16, color: '#007AFF' }} allowFontScaling={false}>Cancelar</Text>
     </TouchableOpacity>
   </View>
 </Modal>
@@ -866,7 +916,7 @@ const filteredData = selected === 'Académicos'
       {/* Cargo - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
-          <Text style={styles.label}>Cargo</Text>
+          <Text style={styles.label} allowFontScaling={false}>Cargo</Text>
           <TouchableOpacity
             onPress={() => setShowUnidadModal2(true)} // <-- tu modal personalizado
             style={{
@@ -883,7 +933,7 @@ const filteredData = selected === 'Académicos'
               fontSize: 16,
               color: selectedCargo ? '#000000' : '#999999',
               fontFamily: 'Montserrat-Regular',
-            }}>
+            }} allowFontScaling={false}>
               {selectedUnidadLabel2 || 'Seleccione un cargo'}
             </Text>
 </TouchableOpacity>
@@ -896,10 +946,10 @@ const filteredData = selected === 'Académicos'
   animationIn="slideInUp"
   animationOut="slideOutDown"
 >
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={{ flex: 1, backgroundColor: '#fff', paddingBottom: 20 }}>
     {/* Encabezado */}
-    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un Cargo</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee', marginTop: Platform.OS === 'ios' ? 50 : 30,  }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona un Cargo</Text>
     </View>
 
     {/* FlatList para scroll infinito */}
@@ -913,6 +963,7 @@ const filteredData = selected === 'Académicos'
             setselectedCargo(item.ID.toString());
             setselectedUnidadLabel2(item.DESC_CARGO);
             setShowUnidadModal2(false);
+            setSeleccionados(prev => ({ ...prev, cargo: item.DESC_CARGO }));
           }}
           style={{
             paddingVertical: 15,
@@ -920,18 +971,13 @@ const filteredData = selected === 'Académicos'
             borderColor: '#eee',
           }}
         >
-          <Text style={{ fontSize: 16 }}>{item.DESC_CARGO}</Text>
+          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_CARGO}</Text>
         </TouchableOpacity>
       )}
-      onEndReached={() => {
-        if (!isFetching) {
-          setPage((prev) => prev + 1);
-          fetchCargos();
-        }
-      }}
+     
       onEndReachedThreshold={0.5}
       ListFooterComponent={isFetching ? (
-        <Text style={{ textAlign: 'center', padding: 10 }}>Cargando más...</Text>
+        <Text style={{ textAlign: 'center', padding: 10 }} allowFontScaling={false}>Cargando más...</Text>
       ) : null}
     />
 
@@ -945,7 +991,7 @@ const filteredData = selected === 'Académicos'
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+      <Text style={{ fontSize: 16, color: '#007AFF' }} allowFontScaling={false}>Cancelar</Text>
     </TouchableOpacity>
   </View>
 </Modal>
@@ -956,7 +1002,7 @@ const filteredData = selected === 'Académicos'
       {/* Edificio - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
-          <Text style={styles.label}>Edificio</Text>
+          <Text style={styles.label} allowFontScaling={false}>Edificio</Text>
           <TouchableOpacity
             onPress={() => setShowUnidadModal3(true)} // <-- tu modal personalizado
             style={{
@@ -973,7 +1019,7 @@ const filteredData = selected === 'Académicos'
               fontSize: 16,
               color: selectedEdificio ? '#000000' : '#999999',
               fontFamily: 'Montserrat-Regular',
-            }}>
+            }} allowFontScaling={false}>
               {selectedUnidadLabel3 || 'Seleccione un edificio'}
             </Text>
 </TouchableOpacity>
@@ -986,10 +1032,10 @@ const filteredData = selected === 'Académicos'
   animationIn="slideInUp"
   animationOut="slideOutDown"
 >
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={{ flex: 1, backgroundColor: '#fff', paddingBottom: 20 }}>
     {/* Encabezado */}
-    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un edificio</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee', marginTop: Platform.OS === 'ios' ? 50 : 30,  }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona un edificio</Text>
     </View>
 
     {/* Lista scrollable */}
@@ -1001,6 +1047,7 @@ const filteredData = selected === 'Académicos'
             setselectedEdificio(item.ID.toString());
             setselectedUnidadLabel3(item.DESC_EDIFICIO);
             setShowUnidadModal3(false);
+            setSeleccionados(prev => ({ ...prev, edificio: item.DESC_EDIFICIO }));
           }}
           style={{
             paddingVertical: 15,
@@ -1008,7 +1055,7 @@ const filteredData = selected === 'Académicos'
             borderColor: '#eee',
           }}
         >
-          <Text style={{ fontSize: 16 }}>{item.DESC_EDIFICIO}</Text>
+          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_EDIFICIO}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -1023,7 +1070,7 @@ const filteredData = selected === 'Académicos'
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+      <Text style={{ fontSize: 16, color: '#007AFF' }} allowFontScaling={false}>Cancelar</Text>
     </TouchableOpacity>
   </View>
 </Modal>
@@ -1034,7 +1081,7 @@ const filteredData = selected === 'Académicos'
       {/* Campus - solo si se selecciona "Académicos" */}
       {selected === 'Académicos' && (
         <>
-          <Text style={styles.label}>Campus</Text>
+          <Text style={styles.label} allowFontScaling={false}>Campus</Text>
           <TouchableOpacity
             onPress={() => setShowUnidadModal4(true)} // <-- tu modal personalizado
             style={{
@@ -1051,7 +1098,7 @@ const filteredData = selected === 'Académicos'
               fontSize: 16,
               color: selectedCampus ? '#000000' : '#999999',
               fontFamily: 'Montserrat-Regular',
-            }}>
+            }} allowFontScaling={false}>
               {selectedUnidadLabel4 || 'Seleccione un campus'}
             </Text>
 </TouchableOpacity>
@@ -1064,10 +1111,10 @@ const filteredData = selected === 'Académicos'
   animationIn="slideInUp"
   animationOut="slideOutDown"
 >
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={{ flex: 1, backgroundColor: '#fff', paddingBottom: 20 }}>
     {/* Encabezado */}
-    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona un campus</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee', marginTop: Platform.OS === 'ios' ? 50 : 30,  }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona un campus</Text>
     </View>
 
     {/* Lista scrollable */}
@@ -1079,6 +1126,7 @@ const filteredData = selected === 'Académicos'
             setselectedCampus(item.ID.toString());
             setselectedUnidadLabel4(item.DESC_CAMPUS);
             setShowUnidadModal4(false);
+            setSeleccionados(prev => ({ ...prev, campus: item.DESC_CAMPUS }));
           }}
           style={{
             paddingVertical: 15,
@@ -1086,7 +1134,7 @@ const filteredData = selected === 'Académicos'
             borderColor: '#eee',
           }}
         >
-          <Text style={{ fontSize: 16 }}>{item.DESC_CAMPUS}</Text>
+          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_CAMPUS}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -1101,7 +1149,7 @@ const filteredData = selected === 'Académicos'
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+      <Text style={{ fontSize: 16, color: '#007AFF' }} allowFontScaling={false}>Cancelar</Text>
     </TouchableOpacity>
   </View>
 </Modal>
@@ -1112,7 +1160,7 @@ const filteredData = selected === 'Académicos'
       
       {selected === 'Alumnos' && (
         <>
-          <Text style={styles.label}>Carrera</Text>
+          <Text style={styles.label} allowFontScaling={false}>Carrera</Text>
           <TouchableOpacity
             onPress={() => setShowUnidadModal5(true)} // <-- tu modal personalizado
             style={{
@@ -1129,7 +1177,7 @@ const filteredData = selected === 'Académicos'
               fontSize: 16,
               color: selectedCarrera ? '#000000' : '#999999',
               fontFamily: 'Montserrat-Regular',
-            }}>
+            }} allowFontScaling={false}>
               {selectedUnidadLabel5 || 'Seleccione un carrera'}
             </Text>
 </TouchableOpacity>
@@ -1142,10 +1190,10 @@ const filteredData = selected === 'Académicos'
   animationIn="slideInUp"
   animationOut="slideOutDown"
 >
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={{ flex: 1, backgroundColor: '#fff', paddingBottom: 20 }}>
     {/* Encabezado */}
-    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee' }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Selecciona una carrera</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderColor: '#eee', marginTop: Platform.OS === 'ios' ? 50 : 30,  }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona una carrera</Text>
     </View>
 
     {/* Lista scrollable */}
@@ -1157,6 +1205,7 @@ const filteredData = selected === 'Académicos'
             setselectedCarrera(item.ID.toString());
             setselectedUnidadLabel5(item.NOM_CARRERA);
             setShowUnidadModal5(false);
+            setSeleccionados(prev => ({ ...prev, carrera: item.NOM_CARRERA }));
           }}
           style={{
             paddingVertical: 15,
@@ -1164,7 +1213,7 @@ const filteredData = selected === 'Académicos'
             borderColor: '#eee',
           }}
         >
-          <Text style={{ fontSize: 16 }}>{item.NOM_CARRERA}</Text>
+          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.NOM_CARRERA}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -1179,7 +1228,7 @@ const filteredData = selected === 'Académicos'
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 16, color: '#007AFF' }}>Cancelar</Text>
+      <Text style={{ fontSize: 16, color: '#007AFF' }} allowFontScaling={false}>Cancelar</Text>
     </TouchableOpacity>
   </View>
 </Modal>
@@ -1275,7 +1324,7 @@ pero con los datos de la persona seleccionada
                 </View>
                 <Text style={styles.iconText} allowFontScaling={false}>Llamar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton} onPress={() => PruebaVariable(selectedItem.DESC_EDIFICIO)}>
+              <TouchableOpacity style={styles.iconButton} onPress={() => PruebaVariable(selectedItem.Sigla_Edif)}>
                 <View style={styles.iconContainer}>
                   <Image source={edificio} style={styles.buttonIcon} />
                 </View>
@@ -1731,7 +1780,8 @@ const styles = StyleSheet.create({
   },
   contenedortodo: {
   marginLeft: 220,
-    padding: 10,
+  padding: 10,
+ 
 },
 
 
@@ -1904,6 +1954,29 @@ modal32: {
     textAlign: 'center',
     fontFamily: 'Montserrat-Regular',
     
+  },
+
+  //Pruebas
+
+  scrollContainer: {
+    marginTop: 10,
+    maxHeight: 30,
+    paddingLeft: 10,
+  }, 
+
+   tagText2: {
+    color: 'white',
+    fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
+  },
+
+  tag2: {
+    backgroundColor: '#40b9e5',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    marginRight: 10,
+   
   },
 });
 

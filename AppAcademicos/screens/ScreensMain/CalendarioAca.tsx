@@ -1,6 +1,6 @@
 import moment from 'moment';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Easing, Image, ImageSourcePropType, Linking, LogBox, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Animated, Easing, Image, ImageSourcePropType, LogBox, Platform, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, ExpandableCalendar, LocaleConfig } from 'react-native-calendars';
 
 LogBox.ignoreLogs([
@@ -90,21 +90,24 @@ const LoadingImage = () => {
 const CalendarioAca = () => {
   const [sections, setSections] = useState<AgendaSection[]>([]);
   const [loading, setLoading] = useState(true);
-  const today = moment().format('YYYY-MM-DD');
+  const [isReady, setIsReady] = useState(false); // Nuevo estado
+  const [showAgenda, setShowAgenda] = useState(false);
 
-  const loadData = async () => {
+  const today = moment().format('YYYY-MM-DD');
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const loadData = useCallback(async () => {
   setLoading(true);
   const [apiData, googleData] = await Promise.all([
     fetchApiEvents(),
     fetchGoogleEvents()
   ]);
-
-  //console.log('Eventos desde la API:', apiData.length, apiData);
-  //console.log('Eventos desde Google:', googleData.length, googleData);
-
+  
   processEventsData(apiData, googleData);
+  await delay(2000);
   setLoading(false);
-};
+  setIsReady(true); // Ya está listo para mostrar contenido
+}, []); // El array vacío indica que esta función no depende de variables externas
+
 
 
   const fetchApiEvents = async (): Promise<RawApiEvent[]> => {
@@ -147,7 +150,11 @@ const CalendarioAca = () => {
       return allEvents;
     } catch (err: any) {
       console.error('Google error:', err.message);
-      Alert.alert('Error al obtener eventos de Google Calendar', err.message);
+      Alert.alert(
+      'Permiso necesario',
+      'No se pudieron obtener los eventos de Google Calendar. Asegúrate de que tu calendario esté configurado como público o compartido correctamente desde tu cuenta de Google.'
+    );
+
       return [];
     }
   };
@@ -167,7 +174,8 @@ const CalendarioAca = () => {
     apiEvents.forEach((item, index) => {
   if (!item.Fecha_inicio) return; // Validación por seguridad
 
-  const startDate = moment(item.Fecha_inicio).format('YYYY-MM-DD');
+  const startDate = item.Fecha_inicio.slice(0, 10);
+
   const hour = formatDate(item.Fecha_inicio);
 
   const eventoInicio: MergedEvent = {
@@ -184,7 +192,7 @@ const CalendarioAca = () => {
   merged[startDate].push(eventoInicio);
 
   if (item.Fecha_fin) {
-    const endDate = moment(item.Fecha_fin).format('YYYY-MM-DD');
+    const endDate = item.Fecha_fin.slice(0, 10);
     const endHour = formatDate(item.Fecha_fin);
 
     const eventoFin: MergedEvent = {
@@ -210,7 +218,7 @@ const CalendarioAca = () => {
 
   if (!startStr) return; // Ignora eventos sin fecha de inicio
 
-  const startDate = moment(startStr).format('YYYY-MM-DD');
+  const startDate = startStr.slice(0, 10);
   const startEvent: MergedEvent = {
     id: `${event.id}-start`,
     title: `${event.summary}`,
@@ -226,7 +234,7 @@ const CalendarioAca = () => {
   merged[startDate].push(startEvent);
 
   if (endStr) {
-    const endDate = moment(endStr).format('YYYY-MM-DD');
+    const endDate = endStr.slice(0, 10);
 
     if (startDate !== endDate) {
       const endEvent: MergedEvent = {
@@ -248,23 +256,39 @@ const CalendarioAca = () => {
 
 
     // Convertir a secciones ordenadas
-    const ordered = Object.keys(merged)
-      .sort()
-      .map(date => ({
-        title: date,
-        data: merged[date]
-      }));
+    const MAX_DAYS = 14;
+  const ordered = Object.keys(merged)
+  .sort()
+  //.slice(0, MAX_DAYS) // Limita a los primeros 14 días
+  .map(date => ({
+    title: date,
+    data: merged[date]
+  }));
+
 
     setSections(ordered);
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+  loadData();
+}, [loadData]);
 
-  const renderItem = useCallback(({ item }: { item: MergedEvent }) => (
-  <TouchableOpacity
-    onPress={() => item.isGoogleEvent && item.link && Linking.openURL(item.link)}
+const markedDates = useMemo(() => {
+    return sections.reduce((acc, sec) => {
+      acc[sec.title] = { marked: true };
+      return acc;
+    }, {} as { [key: string]: { marked: boolean } });
+  }, [sections]);
+
+  useEffect(() => {
+    if (isReady && sections.length > 0) {
+      const t = setTimeout(() => setShowAgenda(true), 300);
+      return () => clearTimeout(t);
+    }
+  }, [isReady, sections]);
+
+  const RenderItem = React.memo(({ item }: { item: MergedEvent }) => (
+  <View
     style={styles.itemContainer}
   >
     <View style={styles.textContainer}>
@@ -281,43 +305,49 @@ const CalendarioAca = () => {
         resizeMode="contain"
       />
     )}
-  </TouchableOpacity>
-), []);
+  </View>
+));
 
 
-  return loading ? (
-    <LoadingImage/>
-  ) : (
 
-<View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 55 : 35 }}>
-    <CalendarProvider date={today} showTodayButton todayBottomMargin={120}>
-      <ExpandableCalendar
-        firstDay={1}
-        markedDates={sections.reduce((acc, sec) => {
-          acc[sec.title] = { marked: true };
-          return acc;
-        }, {} as { [key: string]: { marked: boolean } })}
-        theme={{
-        selectedDayBackgroundColor: '#37bbed', // verde
-        selectedDayTextColor: '#fff',
-        todayTextColor: '#37bbed', // rojo para "Hoy"
-        dayTextColor: '#000',
-        textDisabledColor: '#ccc',
-        arrowColor: '#127ea7', 
-        monthTextColor: '#127ea7', 
-        textSectionTitleColor: '#444',
-  }}
-        />
-      <AgendaList
-        sections={sections}
-        renderItem={renderItem}
-        sectionStyle={styles.section}
-         refreshing={loading}
-        onRefresh={loadData}
-      />
-    </CalendarProvider>
-    </View>
-  );
+  return (
+  <>
+    {loading && !isReady && <LoadingImage />}
+    
+    {isReady && (
+      <View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 55 : 35, paddingBottom: 80 }}>
+        <CalendarProvider date={today} showTodayButton todayBottomMargin={120}>
+          <ExpandableCalendar
+            firstDay={1}
+            markedDates={markedDates}
+            theme={{
+              selectedDayBackgroundColor: '#37bbed',
+              selectedDayTextColor: '#fff',
+              todayTextColor: '#37bbed',
+              dayTextColor: '#000',
+              textDisabledColor: '#ccc',
+              arrowColor: '#127ea7',
+              monthTextColor: '#127ea7',
+              textSectionTitleColor: '#444',
+            }}
+          />
+          <AgendaList
+            sections={sections}
+            renderItem={({ item }) => <RenderItem item={item} />}
+            keyExtractor={item => item.id}
+            sectionStyle={styles.section}
+            refreshing={loading}
+            onRefresh={loadData}
+            initialNumToRender={2}
+    maxToRenderPerBatch={10}
+    windowSize={7}
+          />
+        </CalendarProvider>
+      </View>
+    )}
+  </>
+);
+
 };
 
 export default CalendarioAca;

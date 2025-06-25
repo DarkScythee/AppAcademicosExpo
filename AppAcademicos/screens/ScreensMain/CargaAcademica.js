@@ -77,7 +77,7 @@ export class CargaAcademica extends Component {
   async CargaAcademicaA() {
     const { token } = this.props; 
     const { user } = this.props; 
-    const rut = '8690809';   //const rut = user.Rut; 
+    const rut = '11784541';   //const rut = user.Rut; 
     try {
       const response = await fetch(`https://api-appacademicos.uct.cl/CargaAcademica?search=${rut}`, {
         method: 'GET',

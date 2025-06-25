@@ -67,7 +67,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
     });
   };
 
-
+  
   //---------------menu de configuraciones lateral izquierdo----------------------
   return (
     <DrawerContentScrollView {...props}>
@@ -79,8 +79,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
             <Image source={closeIcon} style={styles.closeIcon} />
           </TouchableOpacity>
         </View>
-  
         <View style={styles.separator3}></View>
+
         {/*}
         <View style={styles.rowTodo}>
           <Text style={styles.label} allowFontScaling={false}>Activar notificaciones</Text>
