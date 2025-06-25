@@ -226,13 +226,26 @@ const PruebaVariable = async (code) => {
   console.log(fechas);
 
   // Verifica si se recibió al menos una ubicación
-if (!fechas || fechas.length === 0) {
-  Alert.alert(
-    'Ubicación no encontrada',
-    'No pudimos encontrar información de ubicación para el funcionario correspondiente.'
+  if (!fechas || fechas.length === 0) {
+    Alert.alert(
+      'Ubicación no encontrada',
+      'No pudimos encontrar información de ubicación para el funcionario correspondiente.'
+    );
+    return;
+  }
+
+  // Verifica si todas las ubicaciones tienen latitud y longitud como null
+  const ubicacionesNulas = fechas.every(
+    (item) => item.latitud_edificio === null || item.longitud_edificio === null
   );
-  return;
-}
+
+  if (ubicacionesNulas) {
+    Alert.alert(
+      'Coordenadas no disponibles',
+      'No se encontraron coordenadas válidas para el funcionario.'
+    );
+    return;
+  }
 
 
   const { latitud_edificio, longitud_edificio } = fechas[0]; // Tomamos la primera ubicación
