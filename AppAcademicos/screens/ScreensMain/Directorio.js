@@ -101,6 +101,62 @@ const FormularioDirectorio = () => {
   carrera: null,
 });
 
+//const para busqueda dinamica filtros:
+
+const [searchUnidad, setSearchUnidad] = useState('');
+const [filteredUnidades, setFilteredUnidades] = useState(unidades);
+
+const [searchCargo, setSearchCargo] = useState('');
+const [filteredCargos, setFilteredCargos] = useState(Cargos);
+
+const [searchEdificio, setSearchEdificio] = useState('');
+const [filteredEdificios, setFilteredEdificios] = useState(Edificio);
+
+const [searchCampus, setSearchCampus] = useState('');
+const [filteredCampus, setFilteredCampus] = useState(Campus);
+
+const [searchCarrera, setSearchCarrera] = useState('');
+const [filteredCarreras, setFilteredCarreras] = useState(Carrera);
+
+//------------------------Busqueda dinamica filtros---------------------------
+
+useEffect(() => {
+  if (showUnidadModal1) {
+    setFilteredUnidades(unidades); // Mostrar todos al abrir
+    setSearchUnidad('');           // Limpiar la búsqueda
+  }
+}, [showUnidadModal1]);
+
+useEffect(() => {
+  if (showUnidadModal2) {
+    setFilteredCargos(Cargos); // Mostrar todos al abrir
+    setSearchCargo('');           // Limpiar la búsqueda
+  }
+}, [showUnidadModal2]);
+
+useEffect(() => {
+  if (showUnidadModal3) {
+    setFilteredEdificios(Edificio); // Mostrar todos al abrir
+    setSearchEdificio('');           // Limpiar la búsqueda
+  }
+}, [showUnidadModal3]);
+
+useEffect(() => {
+  if (showUnidadModal4) {
+    setFilteredCampus(Campus); // Mostrar todos al abrir
+    setSearchCampus('');           // Limpiar la búsqueda
+  }
+}, [showUnidadModal4]);
+
+useEffect(() => {
+  if (showUnidadModal5) {
+    setFilteredCarreras(Carrera); // Mostrar todos al abrir
+    setSearchCarrera('');           // Limpiar la búsqueda
+  }
+}, [showUnidadModal5]);
+
+//---------------------------------------------------------------------------------
+
   useEffect(() => {
     fetchCargos();
     fetchUnidades();
@@ -228,8 +284,7 @@ const PruebaVariable = async (code) => {
   // Verifica si se recibió al menos una ubicación
   if (!fechas || fechas.length === 0) {
     Alert.alert(
-      'Ubicación no encontrada',
-      'No pudimos encontrar información de ubicación para el funcionario correspondiente.'
+      'Ubicación no disponible',
     );
     return;
   }
@@ -241,8 +296,7 @@ const PruebaVariable = async (code) => {
 
   if (ubicacionesNulas) {
     Alert.alert(
-      'Coordenadas no disponibles',
-      'No se encontraron coordenadas válidas para el funcionario.'
+      'Ubicación no disponible',
     );
     return;
   }
@@ -555,7 +609,8 @@ const fetchDataA = async (term) => {
         }
 
         const result = await response.json();
-
+        
+        {/* 
         if (Array.isArray(result)) {
           const updatedData = await Promise.all(result.map(async (item) => {
             const FotoUsuario = item.link_foto;
@@ -569,6 +624,13 @@ const fetchDataA = async (term) => {
             }
             return item;
           }));
+        */}
+          if (Array.isArray(result)) {
+          // Aquí asignamos siempre la foto not_found
+          const updatedData = result.map(item => {
+            item.link_foto = "https://directorio.uct.cl/Fotos/not_found.jpg";
+            return item;
+          });
 
           setDataA(updatedData);
         } else {
@@ -756,6 +818,69 @@ const filteredData = selected === 'Académicos'
   return false;
 };
 
+const filtrarUnidad = (text) => {
+  setSearchUnidad(text);
+  const textoBuscado = quitarTildes(text.toLowerCase());
+
+  setFilteredUnidades(
+    unidades.filter(item =>
+      quitarTildes(item.DESC_UNIDAD.toLowerCase()).includes(textoBuscado)
+    )
+  );
+};
+
+const filtrarCargo = (text) => {
+  setSearchCargo(text);
+
+  const textoBuscado = quitarTildes(text.toLowerCase());
+
+  setFilteredCargos(
+    Cargos.filter(item =>
+      quitarTildes(item.DESC_CARGO.toLowerCase()).includes(textoBuscado)
+    )
+  );
+};
+
+
+const filtrarEdificio = (text) => {
+  setSearchEdificio(text);
+  const textoBuscado = quitarTildes(text.toLowerCase());
+
+  setFilteredEdificios(
+    Edificio.filter(item =>
+      quitarTildes(item.DESC_EDIFICIO.toLowerCase()).includes(textoBuscado)
+    )
+  );
+};
+
+const filtrarCampus = (text) => {
+  setSearchCampus(text);
+  const textoBuscado = quitarTildes(text.toLowerCase());
+
+  setFilteredCampus(
+    Campus.filter(item =>
+      quitarTildes(item.DESC_CAMPUS.toLowerCase()).includes(textoBuscado)
+    )
+  );
+};
+
+const filtrarCarrera = (text) => {
+  setSearchCarrera(text);
+  const textoBuscado = quitarTildes(text.toLowerCase());
+
+  setFilteredCarreras(
+    Carrera.filter(item =>
+      quitarTildes(item.NOM_CARRERA.toLowerCase()).includes(textoBuscado)
+    )
+  );
+};
+
+
+const quitarTildes = (texto) => {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
+
   // Funcion de retorno de todo el componente en si, tanto el buscador, titulos etc.
   return (
     <View style={styles.container}>
@@ -886,27 +1011,42 @@ const filteredData = selected === 'Académicos'
     </View>
 
     {/* Lista scrollable */}
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
-      {unidades.map((item) => (
-        <TouchableOpacity
-          key={item.ID}
-          onPress={() => {
-            setselectedUnidad(item.ID.toString());
-            setselectedUnidadLabel1(item.DESC_UNIDAD);
-            setShowUnidadModal1(false);
-            setSeleccionados(prev => ({ ...prev, unidad: item.DESC_UNIDAD }));
 
-          }}
-          style={{
-            paddingVertical: 15,
-            borderBottomWidth: 1,
-            borderColor: '#eee',
-          }}
-        >
-          <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_UNIDAD}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+    <TextInput
+  placeholder="Buscar unidad"
+  placeholderTextColor="black"  // Aquí defines el color que quieras
+  value={searchUnidad}
+  onChangeText={filtrarUnidad}
+  style={{
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+  }}
+/>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+  {filteredUnidades.map((item) => (
+    <TouchableOpacity
+      key={item.ID}
+      onPress={() => {
+        setselectedUnidad(item.ID.toString());
+        setselectedUnidadLabel1(item.DESC_UNIDAD);
+        setShowUnidadModal1(false);
+        setSeleccionados(prev => ({ ...prev, unidad: item.DESC_UNIDAD }));
+      }}
+      style={{
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+      }}
+    >
+      <Text style={{ fontSize: 16 }} allowFontScaling={false}>{item.DESC_UNIDAD}</Text>
+    </TouchableOpacity>
+  ))}
+</ScrollView>
 
     {/* Botón de cancelar */}
     <TouchableOpacity
@@ -965,9 +1105,27 @@ const filteredData = selected === 'Académicos'
       <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona un Cargo</Text>
     </View>
 
+
+{/* Lista scrollable */}
+
+    <TextInput
+  placeholder="Buscar cargo"
+  placeholderTextColor="black"  // Aquí defines el color que quieras
+  value={searchCargo}
+  onChangeText={filtrarCargo}
+  style={{
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+  }}
+/>
     {/* FlatList para scroll infinito */}
     <FlatList
-      data={Cargos}
+      data={filteredCargos}
       keyExtractor={(item) => item.ID.toString()}
       contentContainerStyle={{ padding: 20 }}
       renderItem={({ item }) => (
@@ -1052,8 +1210,24 @@ const filteredData = selected === 'Académicos'
     </View>
 
     {/* Lista scrollable */}
+
+    <TextInput
+  placeholder="Buscar edificio"
+  placeholderTextColor="black"  // Aquí defines el color que quieras
+  value={searchEdificio}
+  onChangeText={filtrarEdificio}
+  style={{
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+  }}
+/>
     <ScrollView contentContainerStyle={{ padding: 20 }}>
-      {Edificio.map((item) => (
+      {filteredEdificios.map((item) => (
         <TouchableOpacity
           key={item.ID}
           onPress={() => {
@@ -1131,8 +1305,24 @@ const filteredData = selected === 'Académicos'
     </View>
 
     {/* Lista scrollable */}
+
+     <TextInput
+  placeholder="Buscar campus"
+  placeholderTextColor="black"  // Aquí defines el color que quieras
+  value={searchCampus}
+  onChangeText={filtrarCampus}
+  style={{
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+  }}
+/>
     <ScrollView contentContainerStyle={{ padding: 20 }}>
-      {Campus.map((item) => (
+      {filteredCampus.map((item) => (
         <TouchableOpacity
           key={item.ID}
           onPress={() => {
@@ -1209,9 +1399,25 @@ const filteredData = selected === 'Académicos'
       <Text style={{ fontSize: 20, fontWeight: 'bold' }} allowFontScaling={false}>Selecciona una carrera</Text>
     </View>
 
+
+ <TextInput
+  placeholder="Buscar carrera"
+  placeholderTextColor="black"  // Aquí defines el color que quieras
+  value={searchCarrera}
+  onChangeText={filtrarCarrera}
+  style={{
+    marginHorizontal: 20,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+  }}
+/>
     {/* Lista scrollable */}
     <ScrollView contentContainerStyle={{ padding: 20 }}>
-      {Carrera.map((item) => (
+      {filteredCarreras.map((item) => (
         <TouchableOpacity
           key={item.ID}
           onPress={() => {
