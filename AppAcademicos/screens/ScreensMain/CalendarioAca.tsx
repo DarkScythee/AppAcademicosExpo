@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Animated, Easing, Image, ImageSourcePropType, LogBox, Platform, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, ExpandableCalendar, LocaleConfig } from 'react-native-calendars';
-
+import { useUser } from '../ManejoDatos';
 LogBox.ignoreLogs([
   'Warning: useInsertionEffect must not schedule updates.'
 ]);
@@ -92,7 +92,7 @@ const CalendarioAca = () => {
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false); // Nuevo estado
   const [showAgenda, setShowAgenda] = useState(false);
-
+  const { user, token } = useUser();
   const today = moment().format('YYYY-MM-DD');
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
   const loadData = useCallback(async () => {
@@ -127,7 +127,7 @@ const CalendarioAca = () => {
   };
 
   const fetchGoogleEvents = async (): Promise<RawGoogleEvent[]> => {
-    const CALENDAR_ID = 'mjancidakis2020@alu.uct.cl';
+    const CALENDAR_ID = `${user.uid}@uct.cl`;   // ✅ Esto es correcto   //mjancidakis2020@alu.uct.cl   ||       const CALENDAR_ID = `${user.uid}@uct.cl`;       
     const API_KEY = 'AIzaSyAQ0GdogqqLnrr80I-CTz71Q5QN85amHiI';
     const beginDate = moment().toISOString();
     let allEvents: RawGoogleEvent[] = [];
