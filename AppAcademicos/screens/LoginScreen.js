@@ -5,7 +5,7 @@ import { Alert, Image, ImageBackground, Linking, Pressable, StyleSheet, Text, Te
 import { useUser } from './ManejoDatos';
 
 //Imagenes
-const uctImage = require('../imagenes/Fondo.jpg');
+const uctImage = require('../imagenes/cato_fondo.jpg');
 const uctLogo = require('../imagenes/LogoUCT.png');
 
 const LoginScreen = () => {
@@ -135,8 +135,8 @@ const LoginScreen = () => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Correo Institucional"
-            placeholderTextColor="black"
+            placeholder="Email"
+            placeholderTextColor="gray"
             textAlign="left"
             autoCorrect={false}
             autoCapitalize="none"
@@ -147,7 +147,7 @@ const LoginScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
             textAlign="left"
             secureTextEntry
             autoCorrect={false}
@@ -163,7 +163,8 @@ const LoginScreen = () => {
           </Pressable>
           <Pressable onPress={ContraseñaOlvidar}>
             <Text style={styles.forgetText} allowFontScaling={false}>
-              ¿Olvidaste tu contraseña?
+              ¿Has olvidado tu contraseña?
+              Cámbiala en campusID
             </Text>
           </Pressable>
           {/*<Pressable style={styles.button} onPress={sendTestNotification}>
@@ -180,6 +181,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
   },
   image: {
     flex: 1,
@@ -194,13 +196,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   inputContainer: {
-    backgroundColor: '#ECECEC90',
+    backgroundColor: 'rgba(222, 222, 222, 1)',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
     marginBottom: 20,
-    marginTop: -200,
-    width: '90%',
+    alignItems: 'center',  // Centra los elementos dentro del contenedor horizontalmente
+    justifyContent: 'center', // Centra los elementos dentro del contenedor verticalmente
+    width: '70%',
     alignSelf: 'center',
   },
   input: {

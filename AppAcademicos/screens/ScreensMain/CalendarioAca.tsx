@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Easing, Image, ImageSourcePropType, LogBox, Platform, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Easing, Image, ImageBackground, ImageSourcePropType, LogBox, Platform, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, ExpandableCalendar, LocaleConfig } from 'react-native-calendars';
 import { useUser } from '../ManejoDatos';
 LogBox.ignoreLogs([
@@ -19,6 +19,8 @@ LocaleConfig.locales['es'] = {
 LocaleConfig.defaultLocale = 'es';
 const Uctlogo = require('../../imagenes/UCT_logoC.png');
 const GoogleCalendarLogo = require('../../imagenes/GoogleC.png');
+const catolicafondo = require('../../imagenes/cato_fondo.jpg');
+const UCTLOGOHD = require('../../imagenes/LogoUCT.png');
 
 type RawApiEvent = {
   Fecha_inicio: string;
@@ -127,7 +129,7 @@ const CalendarioAca = () => {
   };
 
   const fetchGoogleEvents = async (): Promise<RawGoogleEvent[]> => {
-    const CALENDAR_ID = `${user.uid}@uct.cl`;   // ✅ Esto es correcto   //mjancidakis2020@alu.uct.cl   ||       const CALENDAR_ID = `${user.uid}@uct.cl`;       
+    const CALENDAR_ID = `${user.uid}@uct.cl`;    //   const CALENDAR_ID = `${user.uid}@uct.cl`;       
     const API_KEY = 'AIzaSyAQ0GdogqqLnrr80I-CTz71Q5QN85amHiI';
     const beginDate = moment().toISOString();
     let allEvents: RawGoogleEvent[] = [];
@@ -255,6 +257,8 @@ const CalendarioAca = () => {
 });
 
 
+
+
     // Convertir a secciones ordenadas
     const MAX_DAYS = 14;
   const ordered = Object.keys(merged)
@@ -287,6 +291,7 @@ const markedDates = useMemo(() => {
     }
   }, [isReady, sections]);
 
+
   const RenderItem = React.memo(({ item }: { item: MergedEvent }) => (
   <View
     style={styles.itemContainer}
@@ -312,10 +317,14 @@ const markedDates = useMemo(() => {
 
   return (
   <>
+  
     {loading && !isReady && <LoadingImage />}
-    
     {isReady && (
-      <View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 55 : 35, paddingBottom: 80 }}>
+      <ImageBackground source={catolicafondo} style={styles.background}>
+        <Image source={UCTLOGOHD} style={styles.imagenlogohd}/>
+        
+      <View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 35 : 35, paddingBottom: Platform.OS === 'ios' ? 40 : 20 }}>
+        <View style={styles.overlayTop}>
         <CalendarProvider date={today} showTodayButton todayBottomMargin={120}>
           <ExpandableCalendar
             firstDay={1}
@@ -344,7 +353,11 @@ const markedDates = useMemo(() => {
           />
         </CalendarProvider>
       </View>
+      </View>
+      </ImageBackground>
+      
     )}
+    
   </>
 );
 
@@ -357,6 +370,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  background: {
+  flex: 1,
   },
   itemContainer: {
     backgroundColor: '#fff',
@@ -377,10 +393,15 @@ const styles = StyleSheet.create({
     marginTop: 4
   },
   section: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    backgroundColor: '#f0f0f0'
-  },
+  paddingVertical: 6,
+  paddingHorizontal: 10,
+  backgroundColor: 'transparent', //backgroundColor: 'rgba(255, 255, 255, 0.8)',  /   backgroundColor: 'transparent',
+   fontFamily: 'Ultra2',
+   borderRadius: 6,
+  fontWeight: 'bold',
+  fontSize: 15,
+  color: '#0178bc',
+},
   image: {
     height: 60,
     width: 60,  // Ajusta el tamaño de la imagen según lo necesites
@@ -395,6 +416,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
+  imagenlogohd: {
+    width: 170,           // Ancho de la imagen
+    height: 120,           // Alto de la imagen
+    resizeMode: 'contain',  // Ajusta la imagen para que se vea completa sin recortarse
+    top: 20,              // Mueve la imagen 50 unidades hacia abajo
+    left: '50%',          // Centra la imagen horizontalmente en la pantalla
+    transform: [{ translateX: -90 }], // Corrige la posición de la imagen, para centrarla completamente
+  },
+  overlayTop: {
+    borderColor: 'black',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        flex: 1,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        minHeight: 580,
+        overflow: 'hidden',
+        width: '100%',
+        paddingBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 1,
+        marginTop: 0,
+        top: Platform.OS === 'ios' ? -20 : -30,
+
+  },
+  
   
 
 });

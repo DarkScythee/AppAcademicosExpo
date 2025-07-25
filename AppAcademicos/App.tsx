@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, } from '@react-navigation/drawer';
-import { DrawerActions, NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -14,6 +14,7 @@ import CalendarioAcademico from './screens/ScreensMain/CalendarioAca';
 import CargaAcademica from './screens/ScreensMain/CargaAcademica';
 import FormularioDirectorio from './screens/ScreensMain/Directorio';
 import PantallaPrincipal from './screens/ScreensMain/Principal';
+
 // @ts-ignore
 
 // Imagenes
@@ -21,8 +22,14 @@ const homeIcon = require('./imagenes/home.png');
 const calendarIcon = require('./imagenes/calendar.png');
 const Academico = require('./imagenes/Academico.png');
 const Mensajes = require('./imagenes/Mensajes.png');
-const MenuB = require('./imagenes/menu3.png');
+const MenuB = require('./imagenes/cerrar-sesion.png');
 const closeIcon = require('./imagenes/flecha_derecha.png'); 
+
+//menubarra
+const primeroB = require('./imagenes/casamenu.png');
+const segundoB = require('./imagenes/calendar-alt-regular.png');
+const terceroB = require('./imagenes/book-solid.png');
+const cuartoB = require('./imagenes/user-regular.png'); 
 
 // constantres de navigator, drawernavigator y tabnavigator para navegar entre pantallas, y menus.
 const Stack = createNativeStackNavigator();
@@ -188,162 +195,166 @@ const MainScreenDrawer = () => {
 // Tabnavigator es el menu inferior con todos los estilos que posee para que quede
 // de la manera en la que esta.
 const TabNavigator = () => {
-
-const insets = useSafeAreaInsets();
-
+  const insets = useSafeAreaInsets();
+  const isTablet = false; // usa tu lógica real para tablet
+  const { clearUserData } = useUser();
   return (
-    <Tab.Navigator
-      screenOptions={({ navigation }) => ({
-        headerShown: false, 
-        tabBarStyle: {
-          position: 'absolute',
-          bottom: 10,
-          left: 20,
-          right: 20,
-          elevation: 5,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.5,
-          backgroundColor: 'white',
-          borderRadius: 10,
-          height: 50,
-          borderWidth: 0.2,
-        },
-        // Cambia los colores de los íconos
-        tabBarActiveTintColor: '#0056b3',  // Azul más oscuro o un color más vibrante
-        tabBarInactiveTintColor: '#7f7f7f',
-        headerTitleAlign: 'center',
-      })}
-    >
-
-    {/*------------------Esta son las pantallas del menu inferior que direcciona a cada modulo---------------*/}
-    <Tab.Screen 
-  name="Pantalla Principal" 
-  component={PantallaPrincipal}
-  options={({ navigation }) => ({
-    tabBarIcon: ({ color }) => (
-      <Image source={homeIcon} style={[styles.icon, { tintColor: color }]} />
-    ),
-    tabBarLabel: () => null, // No mostrar etiqueta
-    headerShown: true,
-    tabBarStyle: {
-      position: 'absolute',
-      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
-      left: 20,
-      right: 20,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.5,
-      backgroundColor: 'white',
-      borderRadius: 10,
-      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
-      borderWidth: 0.2,
-    },
     
-    headerTitle: () => null, // No mostrar título en el encabezado
-    headerLeft: () => (
-      <TouchableOpacity 
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      {/* View blanco debajo de la barra elevada */}
+      <View 
+        style={{ 
+          position: 'absolute', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          height: 20, // igual al valor de bottom para rellenar fondo
+          backgroundColor: 'white' 
+        }} 
+      />
+
+      <Tab.Navigator
+        screenOptions={({ navigation }) => ({
+          headerShown: false,
+          tabBarShowLabel: false,     // <---- Agrega esta línea para ocultar texto
+          tabBarStyle: {
+            position: 'absolute',
+            bottom: 0, // 🔼 eleva toda la barra 20 px arriba del borde inferior
+            left: 10,
+            right: 10,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3.5,
+            backgroundColor: 'white',
+            height: isTablet ? 80 : 70,
+            paddingBottom: Platform.OS === 'ios' ? (insets.bottom || 20) : 80, //10 android
+            borderTopWidth: 0.2,
+            paddingHorizontal: 30,  // <--- menos padding para juntar iconos                                             
+          },
+          tabBarActiveTintColor: '#0056b3',
+          tabBarInactiveTintColor: '#7f7f7f',
+          headerTitleAlign: 'center',
+        })}
+      >
+        <Tab.Screen 
+          name="Pantalla Principal" 
+          component={PantallaPrincipal}
+          options={({ navigation }) => ({
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={primeroB} 
+                style={{ width: 35, height: 35, tintColor: color }} 
+              resizeMode="contain" 
+            />
+            ),
+            headerShown: true,
+            headerTitle: () => null,
+            headerLeft: () => (
+              <TouchableOpacity 
+  onPress={() => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Está seguro de que desea cerrar sesión en su cuenta?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Cancelado'),
+          style: 'cancel',
+        },
+        {
+          text: 'Cerrar sesión',
+          onPress: async () => {
+            await clearUserData();
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  }} 
+  style={{ zIndex: 1, position: 'absolute' }} 
+  hitSlop={{ top: 30, bottom: 50, left: 30, right: 20 }}
+>
+  <Image source={MenuB} style={styles.icon2} />
+</TouchableOpacity>
+             /*  <TouchableOpacity 
          onPress={() => navigation.dispatch(DrawerActions.openDrawer())} 
         style={{ zIndex: 1, position: 'absolute' }} 
         hitSlop={{ top: 30, bottom: 50, left: 30, right: 20 }} // Aumenta el área tocable
       >
         <Image source={MenuB} style={styles.icon2} />
-      </TouchableOpacity>
-    ),
-    headerStyle: {
-      backgroundColor: 'transparent', // Fondo del encabezado transparente
-      elevation: 0, // Eliminar sombra en Android
-      shadowOpacity: 0, // Eliminar sombra en iOS
-      height: 0, // Altura mínima para el encabezado
-      borderBottomWidth: 0, // Eliminar la línea inferior
-    },
-  })} 
-/>
+      </TouchableOpacity>*/
 
-      {/*Pantalla del calendario academico */}
-      <Tab.Screen 
-        name="Calendario institucional" 
-        component={CalendarioAcademico}
-        options={{
-          tabBarIcon: ({ color }) => <Image source={calendarIcon} style={[styles.icon, { tintColor: color }]} />,
-          title: 'Calendario Institucional',
-          tabBarLabel: () => null,
-          headerShown: false,
-          tabBarStyle: {
-      position: 'absolute',
-      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
-      left: 20,
-      right: 20,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.5,
-      backgroundColor: 'white',
-      borderRadius: 10,
-      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
-      borderWidth: 0.2,
-    },
-        }} 
-      />
-       {/*Pantalla de la carga academica */}
-      <Tab.Screen 
-        name="Carga Académica" 
-        component={CargaAcademica}
-        options={{
-          tabBarIcon: ({ color }) => <Image source={Academico} style={[styles.icon, { tintColor: color }]} />,
-          title: 'Carga Académica',
-          tabBarLabel: () => null,
-          headerShown: false, // No mostrar encabezado
-          tabBarStyle: {
-      position: 'absolute',
-      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
-      left: 20,
-      right: 20,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.5,
-      backgroundColor: 'white',
-      borderRadius: 10,
-      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
-      borderWidth: 0.2,
-    },
-        }} 
-      />
-       {/*Pantalla del directorio */}
-      <Tab.Screen 
-        name="Directorio" 
-        component={FormularioDirectorio}
-        options={{
-          tabBarIcon: ({ color }) => <Image source={Mensajes} style={[styles.icon, { tintColor: color }]} />,
-          title: 'Directorio',
-          tabBarLabel: () => null,
-          headerShown: false, // No mostrar encabezado
-          tabBarStyle: {
-      position: 'absolute',
-      bottom: Platform.OS === 'ios' ? insets.bottom + -5 : insets.bottom + 0,  // 10 para iOS y 20 para Android
-      left: 20,
-      right: 20,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.5,
-      backgroundColor: 'white',
-      borderRadius: 10,
-      height: isTablet ? 70 : 50, // 👈 Cambia solo en tablet
-      borderWidth: 0.2,
-    },
-        }} 
-      />
-    </Tab.Navigator>
+
+
+            ),
+            headerStyle: {
+              backgroundColor: 'transparent',
+              elevation: 0,
+              shadowOpacity: 0,
+              height: 0,
+              borderBottomWidth: 0,
+            },
+          })}
+        />
+
+        <Tab.Screen 
+          name="Calendario institucional" 
+          component={CalendarioAcademico}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={segundoB} 
+                style={{ width: 35, height: 35, tintColor: color }} 
+              resizeMode="contain" 
+            />
+            ),
+            title: 'Calendario Institucional',
+          }} 
+        />
+
+        <Tab.Screen 
+          name="Carga Académica" 
+          component={CargaAcademica}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Image 
+                source={terceroB} 
+                style={{ width: 35, height: 35, tintColor: color }} 
+              resizeMode="contain" 
+            />
+            ),
+            title: 'Carga Académica',
+          }}
+        />
+
+        <Tab.Screen 
+          name="Directorio" 
+          component={FormularioDirectorio}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Image 
+              source={cuartoB} 
+              style={{ width: 35, height: 35, tintColor: color }} 
+              resizeMode="contain" 
+            />
+            ),
+            title: 'Directorio',
+          }}
+        />
+      </Tab.Navigator>
+    </View>
+    
   );
 };
+
+
 //-------------------------------------------------------------------------------------------------------
 
 // App envuelta en userprovider para utilizar el manejo de datos y tokens del usuario, ademas de la configuracion
@@ -411,7 +422,7 @@ const App = () => {
   useEffect(() => {
     if (Platform.OS === 'android') {
       try {
-        StatusBar.setBackgroundColor('rgb(51, 177, 227)');
+        StatusBar.setBackgroundColor('#2195F2');
         StatusBar.setTranslucent(true);
       } catch (error) {
         console.error('Error configurando la barra de estado:', error);
@@ -449,7 +460,7 @@ const styles = StyleSheet.create({
   icon: {
   width: 28,
   height: 28,
-  marginTop: isTablet ? 30 : 10, // 👈 Espaciado fino vertical adaptable
+  marginTop: isTablet ? 30 : 10, // Espaciado fino vertical adaptable
 
 },
 

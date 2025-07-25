@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { Asset } from 'expo-asset';
+import { useFonts } from 'expo-font';
+import React, { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, ImageBackground, Linking, Modal, PixelRatio, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../ManejoDatos';
-
 // imagenes
 const uctImage = require('../../imagenes/back.jpg');
 const Blackboard = require('../../imagenes/Blackboard.png');
@@ -16,7 +17,8 @@ const flechaabajo = require('../../imagenes/flecha_abajo.png');
 const flechaarriba = require('../../imagenes/flecha_arriba.png');
 const moduloSIG = require('../../imagenes/modulosigvu.png');
 const emailuct = require('../../imagenes/emailuct.png');
-
+const catolicafondo = require('../../imagenes/cato_fondo.jpg');
+const UCTLOGOHD = require('../../imagenes/LogoUCT.png');
 // redes sociales
 const youtube = require('../../imagenes/youtube.png');
 const twitter = require('../../imagenes/twitter.png');
@@ -70,6 +72,7 @@ const PantallaPrincipal = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showData2, setShowData2] = useState(false);
     const [flechaImage, setFlechaImage] = useState(flechaabajo); 
+    const [imagenCargada, setImagenCargada] = useState(false);
 
     // esta funcion se utiliza para arreglar el nombre de la variable que viene del
     // usuario y mostrado de forma ordenada, primer nombre y primer apellido.
@@ -79,6 +82,19 @@ const PantallaPrincipal = () => {
         const lastName = nameParts[0];
         return `${firstName} ${lastName}`;
     };
+
+    const [fontsLoaded] = useFonts({
+        Ultra: require('../../assets/fonts/Montserrat-Bold.ttf'),
+        Ultra2: require('../../assets/fonts/Montserrat-SemiBold.ttf')
+    })
+
+    useEffect(() => {
+        const cargarImagen = async () => {
+            await Asset.loadAsync(catolicafondo); // fondo
+            setImagenCargada(true);
+        };
+        cargarImagen();
+    }, []);
 
 // este renderItem se utiliza para mostrar las paginas web
     const renderItem = ({ item }) => (
@@ -131,21 +147,25 @@ const PantallaPrincipal = () => {
 
    // Cuerpo principal el cual muestra nombre de usuario, y su correo electronico
    // y el resto de componentes como el centro de ayuda, sitios relevantes. etc.
+
+   //if (!imagenCargada) return null;
+   
     return (
-        <ImageBackground source={uctImage} style={styles.background}>
+        <ImageBackground source={catolicafondo} style={styles.background}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+            <Image source={UCTLOGOHD} style={styles.imagenlogohd}/>
                 <View style={styles.container}>
                     <View style={styles.profileContainer}>
-                        <Image source={profileImage} style={styles.profileImage} />
                         <View style={styles.profileTextContainer}>
-                            <Text style={styles.profileName} allowFontScaling={false}>{formatUserName(user.cn)}</Text>
-                            <Text style={styles.profileSubtitle} allowFontScaling={false}>{`${user.uid}@uct.cl`}</Text>
+                            <Text style={styles.tituloapp} allowFontScaling={false}>ACADÉMICOS UCT</Text>
+                            <Text style={styles.profileName} allowFontScaling={false}>Nombre: {formatUserName(user.cn)}</Text>
+                            <Text style={styles.profileSubtitle} allowFontScaling={false}>Correo: {`${user.uid}@uct.cl`}</Text>
                         </View>
                     </View>
 
                     <View style={styles.container2}>
                         <View style={styles.container4}>
-                            <Text style={styles.title2} allowFontScaling={false}>Ayuda y Recursos</Text>
+                            <Text style={styles.title2} allowFontScaling={false}>AYUDA Y RECURSOS</Text>
                         </View>
                         <TouchableOpacity 
                             style={styles.card} 
@@ -174,7 +194,7 @@ const PantallaPrincipal = () => {
                         )}
 
                         <View style={styles.container4}>
-                            <Text style={styles.title2} allowFontScaling={false}>Sitios relevantes</Text>
+                            <Text style={styles.title2} allowFontScaling={false}>SITIOS RELEVANTES</Text>
                             <TouchableOpacity onPress={() => setModalVisible(true)}>
                                 <Text style={styles.title3} allowFontScaling={false}>Ver más</Text>
                             </TouchableOpacity>
@@ -208,9 +228,11 @@ const PantallaPrincipal = () => {
                         onRequestClose={() => {
                             setModalVisible(!modalVisible);
                         }}>
-
+                            <View style={{ flex: 1, backgroundColor: 'rgba(26,131,199,255)' }}>
+                         <ImageBackground source={catolicafondo} style={styles.background}> 
+                        <Image source={UCTLOGOHD} style={styles.imagenlogohd2}/>
                         <View style={styles.modalView}>
-                            <Text style={styles.TituloModal} allowFontScaling={false}>Sitios relevantes</Text>
+                            <Text style={styles.TituloModal} allowFontScaling={false}>SITIOS RELEVANTES</Text>
                               {/*Esta flatlist muestra las paginas web al pulsar ver mas, por lo que las muestra todas*/}
                             <FlatList
                                 data={data}
@@ -222,6 +244,8 @@ const PantallaPrincipal = () => {
                                 <Text style={styles.closeButtonText} allowFontScaling={false}>Cerrar</Text>
                             </Pressable>
                         </View>
+                        </ImageBackground>  
+                        </View>
                     </Modal>
                 </View>
             </ScrollView>
@@ -232,8 +256,23 @@ const PantallaPrincipal = () => {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        resizeMode: 'cover',
+        resizeMode: 'relative',
     },
+    imagenlogohd: {
+    width: 170,           // Ancho de la imagen
+    height: 120,           // Alto de la imagen
+    resizeMode: 'contain',  // Ajusta la imagen para que se vea completa sin recortarse
+    top: 20,
+    left: '-1.1%',          // Centra la imagen horizontalmente en la pantalla
+  },
+  imagenlogohd2:{
+    marginTop: 20,
+    width: 170,           // Ancho de la imagen
+    height: 120,           // Alto de la imagen
+    resizeMode: 'contain',  // Ajusta la imagen para que se vea completa sin recortarse
+    left: '50%',          // Centra la imagen horizontalmente en la pantalla
+    transform: [{ translateX: -90 }], // Corrige la posición de la imagen, para centrarla completamente
+  },
     scrollViewContainer: {
         flexGrow: 1,
         alignItems: 'center', 
@@ -242,6 +281,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 0,
+        top: -60,
     },
     profileContainer: {
         flexDirection: 'row',
@@ -264,37 +304,56 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 35,
-    
-       
         position: 'absolute',
     },
     profileTextContainer: {
-        flexDirection: 'column',
+    flexDirection: 'column',  // Los elementos deben estar en columna
+    alignItems: 'flex-start', // Alinea todos los elementos hacia la izquierda
+    width: '100%',            // Asegura que el contenedor ocupe todo el ancho disponible
+    paddingLeft: 10,          // Agrega un pequeño margen izquierdo para que todo quede alineado
+     paddingLeft: 30,              // Espacio adicional desde el borde izquierdo, ajusta el valor según sea necesario
+    
     },
-    profileName: {
-        fontSize: 24,
-        fontFamily: 'Montserrat-Regular',
-        color: 'white',
-    },
-    profileSubtitle: {
-        fontSize: 16,
-        color: 'white',
-        fontFamily: 'Montserrat-Regular',
-    },
+  tituloapp: {
+    fontSize: 24,             // Este es el tamaño más grande para el título
+    color: 'white',
+    marginBottom: 10,         // Espacio entre los textos
+    alignSelf: 'flex-start',  // Alinea este texto a la izquierda
+    fontFamily: 'Ultra',
+    fontWeight: '800',
+  },
+  profileName: {
+    fontSize: 16,             // Tamanño de fuente igual al de 'Correo'
+    marginBottom: 5,          // Espacio entre los textos
+    color: 'white',
+    alignSelf: 'flex-start',  // Alinea este texto a la izquierda
+    fontFamily: 'Ultra2',
+    fontWeight: '700',
+  },
+  profileSubtitle: {
+    fontSize: 16,             // Tamanño de fuente igual al de 'Nombre'
+    marginBottom: 5,          // Espacio entre los textos
+    color: 'white',
+    alignSelf: 'flex-start',  // Alinea este texto a la izquierda
+    fontFamily: 'Ultra2',
+    fontWeight: '700',
+  },
     title2: {
-        color: 'black',
+        color: '#0178bc',
         textAlign: 'left',
         fontSize: width * 0.055, // 22 si el ancho es 400
         padding: width * 0.03,  // 10 si el ancho es 400
         left: width * 0.04,     // 10 si el ancho es 400
-        fontFamily: 'Montserrat-Regular',
+        fontFamily: 'Ultra',
+        fontWeight: 'bold',
     },
     title3: {
-        color: 'black',
+        color: '#0178bc',
         textAlign: 'right',
         fontSize: 15,
         padding: 10,
-        fontFamily: 'Montserrat-Regular',
+        fontFamily: 'Ultra2',
+        fontWeight: 'bold',
      
     },
     container4: {
@@ -315,7 +374,7 @@ const styles = StyleSheet.create({
 
     container2: {
         borderColor: 'black',
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
         flex: 1,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
@@ -334,9 +393,10 @@ const styles = StyleSheet.create({
         elevation: 1,
         paddingTop: 20,
         marginTop: 90,
+        top: Platform.OS === 'ios' ? -20 : -30,
     },
     flatlistContainer: {
-        paddingBottom: 0, // Cambia el padding para evitar espacio adicional
+        paddingBottom: -100, // Cambia el padding para evitar espacio adicional
         width: '100%',
     },
     flatlistContainer2: {
@@ -391,8 +451,10 @@ const styles = StyleSheet.create({
     modalView: {
         flex: 1,
         width: '100%',
-        backgroundColor: 'white',
-        paddingTop: 60,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        paddingTop: 20,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -402,6 +464,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         alignSelf: 'center',
+        marginTop: 0,
         
     },
     closeButton: {
@@ -494,7 +557,7 @@ const styles = StyleSheet.create({
         maxWidth: 380,          // Puedes establecer un valor máximo si quieres evitar que se haga demasiado ancho en pantallas grandes.
         height: '7%',
         alignSelf: 'center',    // Esto asegura que se mantenga centrado en la pantalla.
-        paddingBottom: 80,
+        paddingBottom: Platform.OS === 'ios' ? 100 : 80,
     },
     
     profileContainer3: {
@@ -579,12 +642,14 @@ const styles = StyleSheet.create({
         marginRight: 10, // Espacio entre la imagen y el texto
     },
     TituloModal: {
-        fontFamily: 'Montserrat-Regular',
+ 
         fontSize: 28,
         textAlign: 'center',
         marginTop: Platform.OS === 'ios' ? 0 : -20,
         padding: 5,
-        color: 'black',
+        color: '#0178bc',
+         fontFamily: 'Ultra',
+        fontWeight: 'bold',
         
     },
     rightImage: {

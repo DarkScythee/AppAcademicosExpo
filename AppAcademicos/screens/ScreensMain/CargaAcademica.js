@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, ImageBackground, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ManeTokens from '../ManejoTokens';
 
 //Imagenes
 const uctImage = require('../../imagenes/back.jpg');
 const FlechaA = require('../../imagenes/flecha_abajo.png');
 const FlechaB = require('../../imagenes/flecha_arriba.png');
-
+const catolicafondo = require('../../imagenes/cato_fondo.jpg');
+const UCTLOGOHD = require('../../imagenes/LogoUCT.png');
 
 export class CargaAcademica extends Component {
   constructor(props) {
@@ -77,7 +78,7 @@ export class CargaAcademica extends Component {
   async CargaAcademicaA() {
     const { token } = this.props; 
     const { user } = this.props; 
-    const rut = user.Rut; //const rut = '11784541';
+    const rut = user.Rut; //const rut = '11784541';  // const rut = user.Rut;
     try {
       const response = await fetch(`https://api-appacademicos.uct.cl/CargaAcademica?search=${rut}`, {
         method: 'GET',
@@ -176,13 +177,13 @@ export class CargaAcademica extends Component {
     const totalCarreras = Array.from(new Set(tableData.map(item => item.Carrera))).length;
 
     return (
+      
+      <ImageBackground source={catolicafondo} style={styles.background}>
+        <Image source={UCTLOGOHD} style={styles.imagenlogohd}/>
       <View style={styles.container}>
-        <Image
-          source={uctImage}
-          style={styles.colorContainer}
-        />
+
           <Text style={styles.TituloP} allowFontScaling={false}>
-            Carga Academica
+            CARGA ACADÉMICA
           </Text>
           {/*En este apartado se muestra una tarjeta pequeña que muestra el total de asignaturas y el total de carreras
           que tiene el academico.
@@ -308,6 +309,7 @@ export class CargaAcademica extends Component {
           </View>
         </Modal>
       </View>
+      </ImageBackground>
     );
   }
 
@@ -435,19 +437,50 @@ export class CargaAcademica extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: 'black',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        flex: 1,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        minHeight: 580,
+        overflow: 'hidden',
+        marginTop: 80,
+        width: '100%',
+        paddingBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 1,
+        paddingTop: 120,
+        marginTop: 10,
   },
+   imagenlogohd: {
+    width: 170,           // Ancho de la imagen
+    height: 120,           // Alto de la imagen
+    resizeMode: 'contain',  // Ajusta la imagen para que se vea completa sin recortarse
+    top: 20,              // Mueve la imagen 50 unidades hacia abajo
+    left: '50%',          // Centra la imagen horizontalmente en la pantalla
+    transform: [{ translateX: -90 }], // Corrige la posición de la imagen, para centrarla completamente
+  },
+  background: {
+        flex: 1,
+        resizeMode: 'relative',
+    },
   colorContainer: {
     alignItems: 'center',
     height: 170,
   },
   TituloP: {
-    color: '#ffffff',
-    fontSize: 28,
+    fontSize: 24,
     top: -90,
     textAlign: 'center',
-    fontFamily: 'Montserrat-Regular', // Cambia aquí por la fuente que desees
+    color: '#0178bc',
+         fontFamily: 'Ultra',
+        fontWeight: 'bold',
   },
   totalesContainer: {
     flexDirection: 'row',

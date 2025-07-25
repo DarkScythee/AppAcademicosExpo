@@ -4,13 +4,13 @@
     "slug": "AppAcademicos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/UCT_logoC.png",
+    "icon": "./assets/images/UCT_logoCS.png",
     "scheme": "appacademicos",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "projectId": "186c5a6a-50c6-49fa-8b0a-a34e6a616c40",
     "notification": {
-      "icon": "./assets/images/UCT_logoC.png",
+      "icon": "./assets/images/UCT_logoCS.png",
       "color": "#2195F2"
     },
     "ios": {
@@ -25,7 +25,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/UCT_logoC.png",
+        "foregroundImage": "./assets/images/UCT_logoCS.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -39,12 +39,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/UCT_logoC.png",
+          "image": "./assets/images/UCT_logoCS.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
@@ -56,6 +57,9 @@
     },
     "updates": {
       "url": "https://u.expo.dev/186c5a6a-50c6-49fa-8b0a-a34e6a616c40"
-    }
+    },
+    "assetBundlePatterns": [
+      "assets/fonts/*"
+    ]
   }
 }

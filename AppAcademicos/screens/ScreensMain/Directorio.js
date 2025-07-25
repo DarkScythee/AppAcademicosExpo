@@ -1,3 +1,4 @@
+import { useFonts } from 'expo-font';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Easing, FlatList, Image, ImageBackground, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -11,7 +12,8 @@ const flecha_blanca = require('../../imagenes/flecha_blanca.png');
 const LupaDirectorio = require('../../imagenes/LupaDirectorio.png');
 const filtrar = require('../../imagenes/flecha_abajo.png');
 const filtroImage = require('../../imagenes/filtrarimage.png');
-
+const catolicafondo = require('../../imagenes/cato_fondo.jpg');
+const UCTLOGOHD = require('../../imagenes/LogoUCT.png');
 // Modal icons
 const telefonochico = require('../../imagenes/call.png');
 const correeochico = require('../../imagenes/email.png');
@@ -39,6 +41,11 @@ const FormularioDirectorio = () => {
   const [placeholder, SetPlaceholder] = useState('Buscar Funcionarios');
   const [unidadD, setUnidadD] = useState('');
   const [cargoD, setCargoD] = useState('');
+
+   const [fontsLoaded] = useFonts({
+          Ultra: require('../../assets/fonts/Montserrat-Bold.ttf'),
+          Ultra2: require('../../assets/fonts/Montserrat-SemiBold.ttf')
+      })
 
   //Tipo
   const [dropdownOpen, setDropdownOpen] = useState(false); 
@@ -883,9 +890,12 @@ const quitarTildes = (texto) => {
 
   // Funcion de retorno de todo el componente en si, tanto el buscador, titulos etc.
   return (
+    <ImageBackground source={catolicafondo} style={styles.background222}>
+    <Image source={UCTLOGOHD} style={styles.imagenlogohd2}/>
     <View style={styles.container}>
-      <Image source={uctImage} style={styles.colorContainer} />
-      <Text style={styles.TituloP} allowFontScaling={false}>Directorio</Text>
+      {/*<Image source={uctImage} style={styles.colorContainer} />*/}
+      <View style={styles.containertransparente}>
+      <Text style={styles.TituloP} allowFontScaling={false}>DIRECTORIO</Text>
       <View style={styles.contenedor1}>
       <View style={styles.contenedor2}>
         <Image source={LupaDirectorio} style={styles.iconoLupa} />
@@ -1514,7 +1524,8 @@ pero con los datos de la persona seleccionada
     }}
     style={styles.modal}
   >
-    <ImageBackground source={background123} style={styles.modalFullScreen}>
+    <ImageBackground source={catolicafondo} style={styles.modalFullScreen}>
+      <Image source={UCTLOGOHD} style={styles.imagenlogohd}/>
       <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
         <View style={styles.iconContainer2}>
           <Image source={flecha_blanca} style={styles.closeIcon} />
@@ -1558,7 +1569,7 @@ pero con los datos de la persona seleccionada
             <Text style={styles.iconText} allowFontScaling={false}>Correo</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.separator} />
+
         <View style={styles.infoContainerModal}>
           <View style={styles.infoText}>      
             <Image source={correeochico} style={styles.imageLogoModal}/>
@@ -1613,27 +1624,22 @@ pero con los datos de la persona seleccionada
     
   </Modal>
 )}
+</View>
     </View>
-    
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+
   },
   container2: {
     marginTop: 60,
     backgroundColor: 'red',
   },
-  TituloP: {
-    color: '#ffffff',
-    fontSize: 28,
-    top: -90,
-    textAlign: 'center',
-    fontFamily: 'Montserrat-Regular',
-  },
+  
   ImagenBorrador: {
     width: 20,
     height: 20,
@@ -1782,20 +1788,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     width: '100%',
+
+    
   },
   modalTitle: {
     fontSize: 18,
     marginBottom: 10,
     color: 'white',
     textAlign: 'center',
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Ultra',
+        fontWeight: 'bold',
+        
   },
   modalTitle2:{
     fontSize: 14,
-
     color: 'white',
     textAlign: 'center',
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Ultra',
+        fontWeight: 'bold',
   },
   infoText: {
     fontSize: 18,
@@ -1805,15 +1815,17 @@ const styles = StyleSheet.create({
     //justifyContent: 'space-between', // Alinea el texto de título y valor a los extremos
     width: '100%',
     fontFamily: 'Montserrat-Regular',
+    backgroundColor: 'red',  // Fondo blanco con 80% de opacidad
+    
     paddingRight: 10,
     marginTop: 10,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',  // Fondo transparente
     paddingLeft: 5,
   },
   blueText: {
     fontSize: 14,
     fontFamily: 'Montserrat-Regular',
-    color: 'black',
+    color: '#515151',
     paddingLeft: 30, // Espacio a la izquierda para separar de "Edificio"
     paddingTop: 4
   },
@@ -1835,7 +1847,7 @@ const styles = StyleSheet.create({
   },
   container6: {
     borderColor: 'black',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     minHeight: 1000,
@@ -1856,9 +1868,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     height: 100,
   },
+  imagenlogohd: {
+    width: 180,           // Ancho de la imagen
+    height: 60,           // Alto de la imagen
+    top: Platform.OS === 'ios' ? 50 : 20,
+    left: '50%',          // Centra la imagen horizontalmente en la pantalla
+    transform: [{ translateX: -90 }], // Corrige la posición de la imagen, para centrarla completamente
+  },
+  imagenlogohd2: {
+   width: 170,           // Ancho de la imagen
+    height: 120,           // Alto de la imagen
+    resizeMode: 'contain',  // Ajusta la imagen para que se vea completa sin recortarse
+    top: 20,              // Mueve la imagen 50 unidades hacia abajo
+    left: '50%',          // Centra la imagen horizontalmente en la pantalla
+    transform: [{ translateX: -90 }], // Corrige la posición de la imagen, para centrarla completamente
+  },
+  
   buttonContainerContac: {
     alignItems: 'left',
     backgroundColor: 'white',
@@ -1875,7 +1903,7 @@ const styles = StyleSheet.create({
   iconText: {
     textAlign: 'center', 
     fontFamily: 'Montserrat-Regular',
-    color: 'black',
+    color: '#515151',
     padding: 5,
   },
   separator: {
@@ -1944,14 +1972,22 @@ const styles = StyleSheet.create({
     marginLeft: 350, // Espacio entre el TextInput y la imagen de la derecha
     marginTop: -205,
   },
-
+TituloP: {
+    color: '#0178bc',
+    fontSize: 24,
+    top: 0,
+    textAlign: 'center',
+    fontFamily: 'Ultra',
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
 
   contenedor1: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    marginTop: -48,
+    marginTop: 20,
     backgroundColor: 'white',
     borderRadius: 15,
     width: '100%', // Ajusta el ancho según sea necesario
@@ -1978,6 +2014,29 @@ const styles = StyleSheet.create({
     zIndex: 1,
     marginLeft: 10,
   },
+  containertransparente: {
+        borderColor: 'black',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        flex: 1,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        minHeight: 580,
+        overflow: 'hidden',
+        marginTop: 20,
+        width: '100%',
+        paddingBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 1,
+        paddingTop: 0,
+        marginTop: 30,
+        top: Platform.OS === 'ios' ? -20 : -30,
+    },
   inputEstilo: {
     flex: 1,
     height: 40,
@@ -2197,6 +2256,11 @@ modal32: {
     marginRight: 10,
    
   },
+  background222: {
+        flex: 1,
+        resizeMode: 'relative',
+    },
+    
 });
 
 export default FormularioDirectorio;
